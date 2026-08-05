@@ -1,0 +1,18 @@
+<div class="p-6 bg-slate-800 rounded-xl border border-slate-700">
+  <h2 class="text-2xl font-bold text-cyan-400 mb-4">Prueba de Conexión al Backend</h2>
+
+  @if (errorConexion()) {
+    <div class="p-4 bg-red-900/50 border border-red-500 text-red-200 rounded-lg">
+      ⚠️ {{ errorConexion() }}. Revisa que tu API de NestJS esté corriendo y tenga los CORS habilitados.
+    </div>
+  } @else if (datosBack().length > 0) {
+    <div class="p-4 bg-green-905/50 border border-green-500 text-green-200 rounded-lg mb-4">
+      ✅ ¡Conexión exitosa! Datos recibidos del backend.
+    </div>
+    <pre class="bg-slate-950 p-4 rounded border border-slate-800 text-xs text-emerald-400 overflow-x-auto">
+      {{ datosBack() | json }}
+    </pre>
+  } @else {
+    <p class="text-slate-400 animate-pulse">Esperando respuesta del backend...</p>
+  }
+</div>

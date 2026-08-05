@@ -1,0 +1,121 @@
+<div class="flex h-screen bg-gray-50 overflow-hidden">
+
+  <!-- ================= SIDEBAR ================= -->
+  <aside
+    class="flex flex-col bg-gradient-to-b from-red-700 to-red-900 text-white transition-all duration-200 shrink-0"
+    [class.w-64]="!sidebarCollapsed"
+    [class.w-20]="sidebarCollapsed"
+  >
+    <!-- Logo / marca -->
+    <div class="flex items-center gap-3 px-5 py-5 border-b border-white/10">
+      <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-red-700 font-bold text-lg shadow-sm">
+        IS
+      </div>
+      @if (!sidebarCollapsed) {
+        <div class="leading-tight overflow-hidden whitespace-nowrap">
+          <p class="font-semibold text-sm">ISP Manager</p>
+          <p class="text-[11px] text-red-200">Panel de Control</p>
+        </div>
+      }
+    </div>
+
+    <!-- Navegación -->
+    <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+      @for (item of menuItems; track item.route) {
+        <a
+          [routerLink]="item.route"
+          routerLinkActive="bg-white/15 text-white"
+          [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
+          class="group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-red-100 hover:bg-white/10 hover:text-white transition-colors"
+        >
+          <span class="shrink-0" [innerHTML]="item.icon"></span>
+
+          @if (!sidebarCollapsed) {
+            <span class="flex-1 truncate">{{ item.label }}</span>
+          }
+
+          @if (!sidebarCollapsed && item.badge) {
+            <span class="flex h-5 min-w-5 items-center justify-center rounded-full bg-white px-1.5 text-[11px] font-semibold text-red-700">
+              {{ item.badge }}
+            </span>
+          }
+        </a>
+      }
+    </nav>
+
+    <!-- Colapsar -->
+    <div class="border-t border-white/10 p-3">
+      <button
+        type="button"
+        (click)="toggleSidebar()"
+        class="flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm text-red-100 hover:bg-white/10 hover:text-white transition-colors"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-4 w-4 shrink-0 transition-transform"
+          [class.rotate-180]="sidebarCollapsed"
+          fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+        </svg>
+        @if (!sidebarCollapsed) {
+          <span>Colapsar</span>
+        }
+      </button>
+    </div>
+  </aside>
+
+  <!-- ================= CONTENIDO ================= -->
+  <div class="flex flex-1 flex-col min-w-0">
+
+    <!-- Header -->
+    <header class="flex items-center justify-between gap-4 border-b border-gray-200 bg-white px-6 py-3 shrink-0">
+      <div class="min-w-0">
+        <p class="text-xs text-gray-400">ISP Manager</p>
+        <h1 class="text-lg font-semibold text-gray-800 truncate">{{ pageTitle }}</h1>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <!-- Buscador -->
+        <div class="hidden sm:flex items-center gap-2 rounded-full bg-gray-100 px-4 py-2 w-64 lg:w-80">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.2-5.2m1.7-5.3a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z" />
+          </svg>
+          <input
+            type="text"
+            placeholder="Buscar cliente, equipo..."
+            class="w-full bg-transparent text-sm text-gray-700 placeholder-gray-400 outline-none"
+          />
+        </div>
+
+        <!-- Notificaciones -->
+        <button type="button" class="relative flex h-10 w-10 items-center justify-center rounded-full bg-red-50 text-red-500 hover:bg-red-100 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.85 23.85 0 0 0 5.454-1.31A8.97 8.97 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.97 8.97 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.26 24.26 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
+          </svg>
+          @if (notificationCount > 0) {
+            <span class="absolute -top-1 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1 text-[11px] font-semibold text-white ring-2 ring-white">
+              {{ notificationCount }}
+            </span>
+          }
+        </button>
+
+        <!-- Usuario -->
+        <div class="flex items-center gap-3">
+          <div class="hidden md:block text-right leading-tight">
+            <p class="text-sm font-medium text-gray-800">{{ usuario.nombre }}</p>
+            <p class="text-xs text-gray-400">{{ usuario.email }}</p>
+          </div>
+          <div class="flex h-10 w-10 items-center justify-center rounded-full bg-red-600 text-sm font-semibold text-white">
+            {{ usuario.iniciales }}
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Área de contenido: aquí se renderiza cada pantalla (Clientes, Equipos, etc.) -->
+    <main class="flex-1 overflow-y-auto p-6">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>
