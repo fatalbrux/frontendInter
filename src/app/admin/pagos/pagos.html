@@ -1,0 +1,188 @@
+<div class="p-6">
+  <p class="text-xs text-gray-400">ISP Manager</p>
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-800">Cobros</h1>
+      <p class="text-xs text-gray-400">Gestión de Cobros · {{ listaPagos().length }} pagos registrados</p>
+    </div>
+    <button (click)="abrirModal()"
+      class="bg-red-600 hover:bg-red-700 text-white text-sm font-medium px-4 py-2 rounded-lg">
+      + Registrar Pago
+    </button>
+  </div>
+
+  <!-- ====== RESUMEN ====== -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+    <div class="bg-white rounded-xl shadow p-4 flex items-center gap-3">
+      <div class="bg-green-100 text-green-600 rounded-lg p-2">💵</div>
+      <div>
+        <p class="text-lg font-bold text-gray-800">Bs. {{ cobrosHoy() }}</p>
+        <p class="text-xs text-gray-400">Cobros de Hoy</p>
+      </div>
+    </div>
+    <div class="bg-white rounded-xl shadow p-4 flex items-center gap-3">
+      <div class="bg-red-100 text-red-600 rounded-lg p-2">📈</div>
+      <div>
+        <p class="text-lg font-bold text-gray-800">Bs. {{ totalIngresosMes() }}</p>
+        <p class="text-xs text-gray-400">Ingresos del Mes</p>
+      </div>
+    </div>
+    <div class="bg-white rounded-xl shadow p-4 flex items-center gap-3">
+      <div class="bg-indigo-100 text-indigo-600 rounded-lg p-2">🧾</div>
+      <div>
+        <p class="text-lg font-bold text-gray-800">{{ listaPagos().length }}</p>
+        <p class="text-xs text-gray-400">Total de Pagos</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== FILTROS ====== -->
+  <div class="flex gap-3 mb-4">
+    <input type="text" [ngModel]="busquedaTabla()" (ngModelChange)="busquedaTabla.set($event)"
+      placeholder="Buscar por cliente o número de recibo..."
+      class="flex-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500" />
+    <select [ngModel]="filtroMetodo()" (ngModelChange)="filtroMetodo.set($event)"
+      class="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500">
+      <option value="Todos">Todos</option>
+      <option value="Efectivo">Efectivo</option>
+      <option value="Código QR">Código QR</option>
+    </select>
+  </div>
+
+  <!-- ====== TABLA ====== -->
+  <div class="bg-white rounded-xl shadow overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="text-left text-gray-400 border-b">
+          <th class="py-3 px-4">Recibo</th>
+          <th class="py-3 px-4">Cliente</th>
+          <th class="py-3 px-4">Fecha</th>
+          <th class="py-3 px-4">Meses</th>
+          <th class="py-3 px-4">Monto</th>
+          <th class="py-3 px-4">Método</th>
+          <th class="py-3 px-4">Venc. anterior</th>
+          <th class="py-3 px-4">Nuevo venc.</th>
+          <th class="py-3 px-4">Notas</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let pago of pagosFiltrados()" class="border-b last:border-0 hover:bg-gray-50">
+          <td class="py-3 px-4 text-red-600 font-medium">{{ pago.nroRecibo }}</td>
+          <td class="py-3 px-4 text-gray-800">{{ nombreCliente(pago.clienteId) }}</td>
+          <td class="py-3 px-4 text-gray-600">{{ pago.fechaPago | date:'yyyy-MM-dd' }}</td>
+          <td class="py-3 px-4">
+            <span class="bg-red-100 text-red-600 text-xs px-2 py-0.5 rounded-full">{{ pago.mesesPagados }}</span>
+          </td>
+          <td class="py-3 px-4 text-green-600 font-semibold">Bs. {{ pago.monto }}</td>
+          <td class="py-3 px-4">
+            <span class="text-xs px-2 py-0.5 rounded-full"
+              [ngClass]="pago.metodoPago === 'Efectivo' ? 'bg-green-100 text-green-700' : 'bg-indigo-100 text-indigo-700'">
+              {{ pago.metodoPago }}
+            </span>
+          </td>
+          <td class="py-3 px-4 text-gray-400">{{ pago.vencimientoAnterior | date:'yyyy-MM-dd' }}</td>
+          <td class="py-3 px-4 text-gray-800 font-medium">{{ pago.nuevoVencimiento | date:'yyyy-MM-dd' }}</td>
+          <td class="py-3 px-4 text-gray-400 italic">{{ pago.notas || '—' }}</td>
+        </tr>
+        <tr *ngIf="pagosFiltrados().length === 0">
+          <td colspan="9" class="py-6 text-center text-gray-400">No se encontraron pagos.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ====== MODAL REGISTRAR PAGO ====== -->
+<div *ngIf="mostrarModal()" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-xl shadow-lg w-full max-w-sm p-6">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="font-semibold text-gray-800">Registrar Nuevo Pago</h3>
+      <button (click)="cerrarModal()" class="text-gray-400 hover:text-gray-600">✕</button>
+    </div>
+
+    <!-- ---- BUSCAR CLIENTE POR CI ---- -->
+    <div *ngIf="!clienteSeleccionado()" class="mb-4">
+      <label class="block text-sm text-gray-600 mb-1">Cliente (buscar por CI)</label>
+      <input type="text" [ngModel]="busquedaCi()" (ngModelChange)="busquedaCi.set($event)"
+        placeholder="Escribe el carnet de identidad..."
+        class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500" />
+
+      <div *ngIf="clientesEncontrados().length > 0"
+        class="mt-2 border rounded-lg divide-y max-h-48 overflow-y-auto">
+        <button *ngFor="let cliente of clientesEncontrados()" (click)="seleccionarCliente(cliente)"
+          class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 flex justify-between items-center">
+          <span class="text-gray-700">{{ cliente.nombres }} {{ cliente.apellidos }}</span>
+          <span class="text-xs text-gray-400">{{ cliente.codigo }} · CI {{ cliente.ci }}</span>
+        </button>
+      </div>
+
+      <p *ngIf="busquedaCi().trim() && clientesEncontrados().length === 0" class="text-xs text-gray-400 mt-2">
+        No se encontró ningún cliente con ese CI.
+      </p>
+    </div>
+
+    <!-- ---- CLIENTE SELECCIONADO ---- -->
+    <div *ngIf="clienteSeleccionado() as cliente">
+      <div class="flex justify-between items-center mb-4">
+        <label class="block text-sm text-gray-600">Cliente</label>
+        <button (click)="quitarClienteSeleccionado()" class="text-xs text-red-600 hover:underline">Cambiar</button>
+      </div>
+      <div class="border rounded-lg px-3 py-2 mb-4 bg-gray-50">
+        <p class="text-sm text-gray-800 font-medium">{{ cliente.nombres }} {{ cliente.apellidos }}</p>
+        <p class="text-xs text-gray-400">{{ cliente.codigo }} · CI {{ cliente.ci }}</p>
+      </div>
+
+      <div class="bg-red-50 rounded-lg px-4 py-3 mb-4">
+        <p class="text-xs text-gray-400">Precio mensual · Próximo vencimiento</p>
+        <p class="text-lg font-bold text-red-600">
+          Bs. {{ precioMensualSeleccionado() }} · {{ cliente.proximoVencimiento | date:'yyyy-MM-dd' }}
+        </p>
+        <p *ngIf="mesesPendientes() > 0" class="text-xs text-red-500 mt-1">
+          ⚠ {{ mesesPendientes() }} mes(es) pendiente(s)
+        </p>
+      </div>
+
+      <label class="block text-sm text-gray-600 mb-1">Fecha de pago</label>
+      <input type="date" [(ngModel)]="fechaPago"
+        class="w-full border rounded-lg px-3 py-2 text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-red-500" />
+
+      <label class="block text-sm text-gray-600 mb-1">Meses a pagar</label>
+      <select [ngModel]="mesesAPagar()" (ngModelChange)="mesesAPagar.set($event)"
+        class="w-full border rounded-lg px-3 py-2 text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-red-500">
+        <option *ngFor="let opcion of opcionesMeses()" [ngValue]="opcion.meses">
+          {{ opcion.meses }} mes(es) — Bs. {{ opcion.monto }}
+        </option>
+      </select>
+
+      <label class="block text-sm text-gray-600 mb-2">Método de pago</label>
+      <div class="grid grid-cols-2 gap-3 mb-4">
+        <button (click)="metodoPago.set('Efectivo')"
+          class="border rounded-lg py-2 text-sm font-medium"
+          [ngClass]="metodoPago() === 'Efectivo' ? 'border-red-500 text-red-600 bg-red-50' : 'border-gray-200 text-gray-600'">
+          Efectivo
+        </button>
+        <button (click)="metodoPago.set('Código QR')"
+          class="border rounded-lg py-2 text-sm font-medium"
+          [ngClass]="metodoPago() === 'Código QR' ? 'border-red-500 text-red-600 bg-red-50' : 'border-gray-200 text-gray-600'">
+          Código QR
+        </button>
+      </div>
+
+      <label class="block text-sm text-gray-600 mb-1">Observaciones (opcional)</label>
+      <input type="text" [ngModel]="notas()" (ngModelChange)="notas.set($event)" placeholder="Notas del pago..."
+        class="w-full border rounded-lg px-3 py-2 text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-red-500" />
+
+      <div class="bg-green-50 rounded-lg px-4 py-3 mb-6 flex justify-between items-center">
+        <span class="text-sm text-gray-600">Total a cobrar:</span>
+        <span class="text-lg font-bold text-green-700">Bs. {{ totalACobrar() }}</span>
+      </div>
+
+      <div class="flex justify-end gap-3">
+        <button (click)="cerrarModal()" class="px-4 py-2 rounded-lg border text-sm text-gray-600">Cancelar</button>
+        <button (click)="confirmarPago()" class="px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white text-sm">
+          ✓ Confirmar pago
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
