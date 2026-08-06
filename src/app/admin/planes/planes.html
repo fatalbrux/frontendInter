@@ -1,0 +1,93 @@
+<div class="p-6">
+  <p class="text-xs text-gray-400">ISP Manager</p>
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-800">Planes</h1>
+      <p class="text-xs text-gray-400">{{ listaPlanes().length }} planes registrados</p>
+    </div>
+    <button (click)="abrirModalCrear()"
+      class="bg-red-600 hover:bg-red-700 text-white text-sm font-medium px-4 py-2 rounded-lg">
+      + Nuevo Plan
+    </button>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div *ngFor="let plan of listaPlanes()"
+      class="bg-white rounded-xl shadow p-5 border-l-4 border-red-600">
+      <div class="flex justify-between items-start mb-2">
+        <h3 class="font-semibold text-gray-800">{{ plan.nombre }}</h3>
+        <span class="text-xs px-2 py-0.5 rounded-full"
+          [ngClass]="plan.estado === 'Activo' ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-500'">
+          {{ plan.estado }}
+        </span>
+      </div>
+
+      <p class="text-sm text-gray-500 mb-1">{{ plan.anchoBanda }}</p>
+      <p class="text-xl font-bold text-red-600 mb-2">Bs. {{ plan.precioMensual }}<span class="text-xs text-gray-400 font-normal">/mes</span></p>
+      <p class="text-xs text-gray-400 mb-4">{{ plan.descripcion }}</p>
+
+      <div class="flex gap-2">
+        <button (click)="seleccionarParaEditar(plan)"
+          class="flex-1 border rounded-lg py-1.5 text-sm text-gray-600 hover:bg-gray-50">Editar</button>
+        <button (click)="cambiarEstado(plan)"
+          class="flex-1 rounded-lg py-1.5 text-sm"
+          [ngClass]="plan.estado === 'Activo' ? 'bg-amber-100 text-amber-700 hover:bg-amber-200' : 'bg-green-100 text-green-700 hover:bg-green-200'">
+          {{ plan.estado === 'Activo' ? 'Desactivar' : 'Activar' }}
+        </button>
+        <button (click)="eliminar(plan.id)"
+          class="rounded-lg px-3 py-1.5 text-sm bg-red-50 text-red-600 hover:bg-red-100">🗑</button>
+      </div>
+    </div>
+
+    <p *ngIf="listaPlanes().length === 0" class="text-sm text-gray-400">No hay planes registrados.</p>
+  </div>
+</div>
+
+<!-- ====== MODAL PLAN ====== -->
+<div *ngIf="mostrarModal()" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+  <div class="bg-white rounded-xl shadow-lg w-full max-w-md p-6">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="font-semibold text-gray-800">{{ modoEdicion() ? 'Editar Plan' : 'Nuevo Plan' }}</h3>
+      <button (click)="cerrarModal()" class="text-gray-400 hover:text-gray-600">✕</button>
+    </div>
+
+    <label class="block text-sm text-gray-600 mb-1">Nombre del plan</label>
+    <input type="text" [(ngModel)]="formulario.nombre" placeholder="Ej: Plan Hogar 10MB"
+      class="w-full border rounded-lg px-3 py-2 text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-red-500" />
+
+    <div class="grid grid-cols-2 gap-4 mb-4">
+      <div>
+        <label class="block text-sm text-gray-600 mb-1">Ancho de banda</label>
+        <input type="text" [(ngModel)]="formulario.anchoBanda" placeholder="Ej: 10 Mbps"
+          class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500" />
+      </div>
+      <div>
+        <label class="block text-sm text-gray-600 mb-1">Precio mensual (Bs.)</label>
+        <input type="number" [(ngModel)]="formulario.precioMensual" placeholder="150"
+          class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500" />
+      </div>
+    </div>
+
+    <label class="block text-sm text-gray-600 mb-1">Descripción</label>
+    <textarea [(ngModel)]="formulario.descripcion" placeholder="Detalles del plan..."
+      class="w-full border rounded-lg px-3 py-2 text-sm mb-6 focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
+
+    <div class="flex justify-end gap-3">
+      <button (click)="cerrarModal()" class="px-4 py-2 rounded-lg border text-sm text-gray-600">Cancelar</button>
+      <button (click)="guardar()" class="px-4 py-2 rounded-lg bg-red-600 text-white text-sm">
+        {{ modoEdicion() ? 'Guardar cambios' : 'Crear plan' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== CONFIRMAR ELIMINAR PLAN ====== -->
+<div *ngIf="mostrarConfirmarEliminar()" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+  <div class="bg-white rounded-xl shadow-lg w-full max-w-sm p-6 text-center">
+    <p class="text-gray-700 mb-6">¿Seguro que deseas eliminar este plan?</p>
+    <div class="flex justify-center gap-3">
+      <button (click)="cancelarEliminar()" class="px-4 py-2 rounded-lg border text-sm text-gray-600">Cancelar</button>
+      <button (click)="confirmarEliminarReal()" class="px-4 py-2 rounded-lg bg-red-600 text-white text-sm">Eliminar</button>
+    </div>
+  </div>
+</div>

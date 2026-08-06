@@ -3,16 +3,24 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Cliente } from '../interfaces/cliente';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class ClientesService {
-private readonly http=inject(HttpClient);
-  // Pon aquí la URL real de tu backend (ej. el de NestJS)
-  private readonly apiUrl='http://localhost:3000/cliente'; 
+  private readonly urlBase='http://localhost:3000/cliente';
+  private readonly http=inject(HttpClient);
 
-  probarConexion(): Observable<Cliente[]> {
-    return this.http.get<Cliente[]>(this.apiUrl);
+  funListar():Observable<Cliente[]>{
+    return this.http.get<Cliente[]>(this.urlBase);
   }
 
+  funGuardar(dato:Partial<Cliente>){
+    return this.http.post(this.urlBase,dato);
+  }
+
+  funEditar(dato:Partial<Cliente>,id:number){
+    return this.http.patch(`${this.urlBase}/${id}`,dato);
+  }
+
+  funEliminar(id:number){
+    return this.http.delete(`${this.urlBase}/${id}`);
+  }
 }
