@@ -1,0 +1,122 @@
+<div class="p-6">
+  <p class="text-xs text-gray-400">ISP Manager</p>
+  <h1 class="text-2xl font-bold text-gray-800 mb-6">Dashboard</h1>
+
+  @if (cargando()) {
+    <p class="text-gray-400">Cargando...</p>
+  } @else if (resumen(); as res) {
+
+    <!-- tarjetas resumen -->
+    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-4">
+      <div class="bg-white rounded-xl shadow p-4">
+        <p class="text-2xl font-bold text-gray-800">{{ res.totalClientes }}</p>
+        <p class="text-xs text-gray-400">Total Clientes</p>
+      </div>
+      <div class="bg-white rounded-xl shadow p-4">
+        <p class="text-2xl font-bold text-emerald-600">{{ res.clientesActivos }}</p>
+        <p class="text-xs text-gray-400">Clientes Activos</p>
+      </div>
+      <div class="bg-white rounded-xl shadow p-4">
+        <p class="text-2xl font-bold text-amber-600">{{ res.clientesSuspendidos }}</p>
+        <p class="text-xs text-gray-400">Suspendidos</p>
+      </div>
+      <div class="bg-white rounded-xl shadow p-4">
+        <p class="text-2xl font-bold text-rose-600">{{ res.clientesCorte }}</p>
+        <p class="text-xs text-gray-400">Corte de Servicio</p>
+      </div>
+      <div class="bg-white rounded-xl shadow p-4">
+        <p class="text-2xl font-bold text-blue-600">{{ res.equiposInstalados }}</p>
+        <p class="text-xs text-gray-400">Equipos Instalados</p>
+      </div>
+      <div class="bg-white rounded-xl shadow p-4">
+        <p class="text-2xl font-bold text-emerald-600">{{ res.equiposDisponibles }}</p>
+        <p class="text-xs text-gray-400">Equipos Disponibles</p>
+      </div>
+      <div class="bg-white rounded-xl shadow p-4">
+        <p class="text-2xl font-bold text-gray-800">Bs. {{ res.cobrosHoy }}</p>
+        <p class="text-xs text-gray-400">Cobros de Hoy</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4 mb-4">
+      <div class="bg-white rounded-xl shadow p-4">
+        <p class="text-2xl font-bold text-gray-800">Bs. {{ res.ingresosMes }}</p>
+        <p class="text-xs text-gray-400">Ingresos del Mes</p>
+      </div>
+      <div class="bg-white rounded-xl shadow p-4">
+        <p class="text-2xl font-bold text-gray-800">Bs. {{ res.ingresosAno }}</p>
+        <p class="text-xs text-gray-400">Ingresos del Año</p>
+      </div>
+    </div>
+
+    <!-- gráficos principales -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+      <div class="bg-white rounded-xl shadow p-4">
+        <p class="font-semibold text-gray-800 mb-2">Ingresos mensuales (Bs.)</p>
+        <ngx-charts-line-chart
+          [results]="datosIngresosMensuales()"
+          [xAxis]="true" [yAxis]="true"
+          [scheme]="colorScheme"
+          [autoScale]="true"
+          [view]="[500, 250]">
+        </ngx-charts-line-chart>
+      </div>
+      <div class="bg-white rounded-xl shadow p-4">
+        <p class="font-semibold text-gray-800 mb-2">Clientes por Zona</p>
+        <ngx-charts-bar-horizontal
+          [results]="datosClientesPorZona()"
+          [xAxis]="true" [yAxis]="true"
+          [scheme]="colorScheme"
+          [view]="[500, 250]">
+        </ngx-charts-bar-horizontal>
+      </div>
+    </div>
+
+    <!-- donas -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+      <div class="bg-white rounded-xl shadow p-4">
+        <p class="font-semibold text-gray-800 mb-2">Estado de Clientes</p>
+        <ngx-charts-pie-chart [results]="datosEstadoClientes()" [scheme]="colorScheme" [doughnut]="true" [view]="[300, 250]"></ngx-charts-pie-chart>
+      </div>
+      <div class="bg-white rounded-xl shadow p-4">
+        <p class="font-semibold text-gray-800 mb-2">Métodos de Pago</p>
+        <ngx-charts-pie-chart [results]="datosMetodosPago()" [scheme]="colorScheme" [doughnut]="true" [view]="[300, 250]"></ngx-charts-pie-chart>
+      </div>
+      <div class="bg-white rounded-xl shadow p-4">
+        <p class="font-semibold text-gray-800 mb-2">Estado de Equipos</p>
+        <ngx-charts-pie-chart [results]="datosEstadoEquipos()" [scheme]="colorScheme" [doughnut]="true" [view]="[300, 250]"></ngx-charts-pie-chart>
+      </div>
+    </div>
+
+    <!-- listas -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div class="bg-white rounded-xl shadow p-4">
+        <p class="font-semibold text-gray-800 mb-3">🕒 Próximos Vencimientos</p>
+        @for (cli of proximosVencimientos(); track cli.id) {
+          <div class="flex justify-between items-center bg-amber-50 rounded-lg px-3 py-2 mb-2">
+            <div>
+              <p class="text-sm font-semibold text-gray-800">{{ cli.nombres }} {{ cli.apellidos }}</p>
+              <p class="text-xs text-gray-400">{{ cli.zona?.nombre }} · {{ cli.codigo }}</p>
+            </div>
+            <p class="text-sm font-semibold text-amber-600">{{ cli.proximoVencimiento }}</p>
+          </div>
+        } @empty {
+          <p class="text-sm text-gray-400">No hay vencimientos esta semana.</p>
+        }
+      </div>
+      <div class="bg-white rounded-xl shadow p-4">
+        <p class="font-semibold text-gray-800 mb-3">🚨 Deudores con Corte</p>
+        @for (cli of deudoresConCorte(); track cli.id) {
+          <div class="flex justify-between items-center bg-rose-50 rounded-lg px-3 py-2 mb-2">
+            <div>
+              <p class="text-sm font-semibold text-gray-800">{{ cli.nombres }} {{ cli.apellidos }}</p>
+              <p class="text-xs text-gray-400">{{ cli.zona?.nombre }} · {{ cli.codigo }}</p>
+            </div>
+          </div>
+        } @empty {
+          <p class="text-sm text-gray-400">No hay clientes con corte.</p>
+        }
+      </div>
+    </div>
+  }
+</div>
