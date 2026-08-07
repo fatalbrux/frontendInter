@@ -6,6 +6,7 @@ import { Planes } from './admin/planes/planes';
 import { Equipos } from './admin/equipos/equipos';
 import { Pagos } from './admin/pagos/pagos';
 import { Instalaciones } from './admin/instalaciones/instalaciones';
+import { PerfilCliente } from './admin/perfil-cliente/perfil-cliente';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'admin', pathMatch: 'full' },
@@ -20,6 +21,7 @@ export const routes: Routes = [
       { path: 'equipos', component: Equipos },
       { path: 'pagos', component: Pagos },
       { path: 'instalaciones', component: Instalaciones },
+      { path: 'clientes/:id', component: PerfilCliente },
     ]
   },
   { path: '**', redirectTo: 'admin' }

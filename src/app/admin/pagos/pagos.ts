@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { PagosService } from '../../core/services/pagos';
 import { ClientesService } from '../../core/services/clientes';
 import { PlanesService } from '../../core/services/planes';
-import { Pago } from '../../core/interfaces/pago';
+import { MetodoPago, Pago, PagoPayload } from '../../core/interfaces/pago';
 import { Cliente } from '../../core/interfaces/cliente';
 import { Plan } from '../../core/interfaces/plan';
 
@@ -29,15 +29,15 @@ export class Pagos implements OnInit {
   filtroMetodo = signal<string>('Todos');
 
   pagosFiltrados = computed(() => {
-    const texto = this.busquedaTabla().toLowerCase().trim();
-    const metodo = this.filtroMetodo();
-    return this.listaPagos().filter(pago => {
-      const nombre = this.nombreCliente(pago.clienteId).toLowerCase();
-      const coincideTexto = !texto || nombre.includes(texto) || pago.nroRecibo.toLowerCase().includes(texto);
-      const coincideMetodo = metodo === 'Todos' || pago.metodoPago === metodo;
-      return coincideTexto && coincideMetodo;
-    });
+  const texto = this.busquedaTabla().toLowerCase().trim();
+  const metodo = this.filtroMetodo();
+  return this.listaPagos().filter(pago => {
+    const nombre = this.nombreClientePago(pago).toLowerCase();
+    const coincideTexto = !texto || nombre.includes(texto) || pago.nroRecibo.toLowerCase().includes(texto);
+    const coincideMetodo = metodo === 'Todos' || pago.metodoPago === metodo;
+    return coincideTexto && coincideMetodo;
   });
+});
 
   // ================= MODAL REGISTRAR PAGO =================
   mostrarModal = signal<boolean>(false);
@@ -61,9 +61,7 @@ export class Pagos implements OnInit {
 
   precioMensualSeleccionado = computed(() => {
     const cliente = this.clienteSeleccionado();
-    if (!cliente) return 0;
-    const plan = this.listaPlanes().find(p => p.id === cliente.planId);
-    return plan?.precioMensual ?? 0;
+    return cliente?.plan?.precioMensual ?? 0;
   });
 
   mesesPendientes = computed(() => {
@@ -115,6 +113,9 @@ export class Pagos implements OnInit {
     const cliente = this.listaClientes().find(c => c.id === clienteId);
     return cliente ? `${cliente.nombres} ${cliente.apellidos}` : '—';
   }
+  nombreClientePago(pago: Pago): string {
+  return pago.cliente ? `${pago.cliente.nombres} ${pago.cliente.apellidos}` : '—';
+}
 
   totalIngresosMes(): number {
     const hoy = new Date();
@@ -166,11 +167,11 @@ export class Pagos implements OnInit {
     const vencimientoAnterior = cliente.proximoVencimiento ?? new Date();
     const nuevoVencimiento = this.calcularNuevoVencimiento(new Date(vencimientoAnterior), this.mesesAPagar());
 
-    const dato: Partial<Pago> = {
-      fechaPago: new Date(this.fechaPago),
+    const dato: PagoPayload = {
+      fechaPago: this.fechaPago,
       mesesPagados: this.mesesAPagar(),
       monto: this.totalACobrar(),
-      metodoPago: this.metodoPago(),
+      metodoPago: this.metodoPago() as MetodoPago,
       vencimientoAnterior: new Date(vencimientoAnterior),
       nuevoVencimiento: nuevoVencimiento,
       notas: this.notas(),

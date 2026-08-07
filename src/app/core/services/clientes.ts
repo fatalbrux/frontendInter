@@ -12,6 +12,12 @@ export class ClientesService {
     return this.http.get<Cliente[]>(this.urlBase);
   }
 
+   // Necesario para el perfil-cliente (GET /cliente/:id)
+  funObtenerUno(id: number): Observable<Cliente> {
+    return this.http.get<Cliente>(`${this.urlBase}/${id}`);
+  }
+
+
   funGuardar(dato:Partial<Cliente>){
     return this.http.post(this.urlBase,dato);
   }
