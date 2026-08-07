@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { DashboardResumen } from '../interfaces/dashboard';
+import { DashboardResumen, DeudorCorte, ProximoVencimiento } from '../interfaces/dashboard';
 import { Cliente } from '../interfaces/cliente';
 import { ClienteMoroso } from '../interfaces/dashboard';
 
@@ -14,13 +14,13 @@ export class DashboardService {
     return this.http.get<DashboardResumen>(`${this.urlBase}/resumen`);
   }
 
-  funProximosVencimientos(): Observable<Cliente[]> {
-    return this.http.get<Cliente[]>(`${this.urlBase}/proximos-vencimientos`);
-  }
+  funProximosVencimientos(): Observable<ProximoVencimiento[]> {
+  return this.http.get<ProximoVencimiento[]>(`${this.urlBase}/proximos-vencimientos`);
+}
 
-  funDeudoresConCorte(): Observable<Cliente[]> {
-    return this.http.get<Cliente[]>(`${this.urlBase}/deudores-corte`);
-  }
+funDeudoresConCorte(): Observable<DeudorCorte[]> {
+  return this.http.get<DeudorCorte[]>(`${this.urlBase}/deudores-corte`);
+}
 
   funMorosos(): Observable<ClienteMoroso[]> {
   return this.http.get<ClienteMoroso[]>(`${this.urlBase}/morosos`);

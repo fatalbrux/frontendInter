@@ -9,13 +9,14 @@ import { PagosService } from '../../core/services/pagos';
 import { Cliente, ClientePayload, EstadoCliente } from '../../core/interfaces/cliente';
 import { Zona } from '../../core/interfaces/zona';
 import { Plan } from '../../core/interfaces/plan';
-import { PagoPayload, MetodoPago } from '../../core/interfaces/pago';
+import { PagoPayload, MetodoPago, BancoPago } from '../../core/interfaces/pago';
 
 const FORMULARIO_VACIO: ClientePayload = {
   codigo: '',
   nombres: '',
   apellidos: '',
   ci: '',
+  usuario: '',
   telefono: '',
   email: '',
   direccion: '',
@@ -41,10 +42,47 @@ export class Clientes implements OnInit {
   private readonly planesService = inject(PlanesService);
   private readonly pagosService = inject(PagosService);
 
+// LOGICA DE FECHAS DE VENCIMIENTO
+  private fechaEfectivaVencimiento(cliente: Cliente): Date | null {
+  if (cliente.proximoVencimiento) return this.parseFechaLocal(cliente.proximoVencimiento);
+
+  const base = cliente.fechaPrimerPago ?? cliente.fechaInstalacion;
+  if (!base) return null;
+
+  const fecha = this.parseFechaLocal(base);
+  fecha.setMonth(fecha.getMonth() + 1);
+  return fecha;
+}
+
+private fechaBaseVencimiento(cliente: Cliente): Date {
+  return this.fechaEfectivaVencimiento(cliente) ?? new Date();
+}
+
+fechaVencimientoDisplay(cliente: Cliente): string {
+  const efectiva = this.fechaEfectivaVencimiento(cliente);
+  if (!efectiva) return 'Sin registro previo';
+
+  const d = String(efectiva.getDate()).padStart(2, '0');
+  const m = String(efectiva.getMonth() + 1).padStart(2, '0');
+  const y = efectiva.getFullYear();
+  return `${d}/${m}/${y}`;
+}
+
+
+
+
+
+
+
+
+
+
   // ---------- datos ----------
   listaClientes = signal<Cliente[]>([]);
   listaZonas = signal<Zona[]>([]);
   listaPlanes = signal<Plan[]>([]);
+  bancosDisponibles: BancoPago[] = ['Banco Unión', 'Banco BNB', 'Banco Prodem', 'Tigo Money'];
+bancoSeleccionado = signal<BancoPago | null>(null);
 
   // ---------- estado de UI ----------
   cargando = signal<boolean>(false);
@@ -118,6 +156,7 @@ export class Clientes implements OnInit {
       nombres: cli.nombres,
       apellidos: cli.apellidos,
       ci: cli.ci ?? '',
+      usuario: cli.usuario ?? '',
       telefono: cli.telefono ?? '',
       email: cli.email ?? '',
       direccion: cli.direccion ?? '',
@@ -142,10 +181,13 @@ export class Clientes implements OnInit {
 
     const idActual = this.idSeleccionado();
 
+
+  const datoLimpio = this.limpiarPayload(this.formulario); // nuevo
+
     const peticion =
       this.modoEdicion() && idActual !== null
-        ? this.clientesService.funEditar(this.formulario, idActual)
-        : this.clientesService.funGuardar(this.formulario);
+      ? this.clientesService.funEditar(datoLimpio, idActual)
+      : this.clientesService.funGuardar(datoLimpio);
 
     peticion.subscribe({
       next: () => this.reiniciarYRefrescar(),
@@ -217,6 +259,7 @@ export class Clientes implements OnInit {
   // ---------- modal rápido: registrar pago ----------
   abrirModalPago(cli: Cliente): void {
     this.clienteParaPago.set(cli);
+  this.bancoSeleccionado.set(null); // nuevo
     this.formularioPago = {
       ...this.formularioPagoVacio(),
       clienteId: cli.id,
@@ -248,7 +291,7 @@ export class Clientes implements OnInit {
     return;
   }
 
-  const vencimientoAnterior = cli.proximoVencimiento ?? new Date();
+  const vencimientoAnterior = this.fechaBaseVencimiento(cli); // cambia aquí
   const nuevoVencimiento = this.calcularNuevoVencimiento(
     new Date(vencimientoAnterior),
     this.formularioPago.mesesPagados ?? 1
@@ -258,6 +301,7 @@ export class Clientes implements OnInit {
     ...this.formularioPago,
     vencimientoAnterior: new Date(vencimientoAnterior),
     nuevoVencimiento,
+    ...(this.formularioPago.metodoPago === 'Código QR' && { banco: this.bancoSeleccionado() ?? undefined }),
   };
 
   this.pagosService.funGuardar(dato).subscribe({
@@ -286,6 +330,16 @@ private parseFechaLocal(fecha: string | Date): Date {
   return new Date(y, m - 1, d);
 }
 
+private limpiarPayload(payload: ClientePayload): ClientePayload {
+  const limpio = { ...payload };
+  (Object.keys(limpio) as (keyof ClientePayload)[]).forEach((key) => {
+    if (limpio[key] === '') {
+      (limpio[key] as any) = undefined;
+    }
+  });
+  return limpio;
+}
+
 // Cuántos días de anticipación se permite pagar antes del vencimiento
 private readonly DIAS_ANTICIPACION_PAGO = 5;
 
@@ -293,9 +347,7 @@ vencimientoPreview(): string {
   const cli = this.clienteParaPago();
   if (!cli) return '—';
 
-  const base = cli.proximoVencimiento
-    ? this.parseFechaLocal(cli.proximoVencimiento)
-    : new Date();
+  const base = this.fechaBaseVencimiento(cli); // cambia aquí
 
   const meses = this.formularioPago.mesesPagados ?? 1;
   const nueva = this.calcularNuevoVencimiento(base, meses); // reutiliza la que ya tienes

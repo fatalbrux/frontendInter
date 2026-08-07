@@ -2,8 +2,9 @@ import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { DashboardService } from '../../core/services/dashboard';
-import { DashboardResumen } from '../../core/interfaces/dashboard';
+import { DashboardResumen, ProximoVencimiento, DeudorCorte } from '../../core/interfaces/dashboard';
 import { Cliente } from '../../core/interfaces/cliente';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
@@ -13,10 +14,16 @@ import { Cliente } from '../../core/interfaces/cliente';
 })
 export class Dashboard implements OnInit {
   private readonly dashboardService = inject(DashboardService);
+  private readonly router = inject(Router);
+
+  proximosVencimientos = signal<ProximoVencimiento[]>([]);
+  deudoresConCorte = signal<DeudorCorte[]>([]);
+
+  irAPerfil(id: number): void {
+  this.router.navigate(['/admin/clientes', id]);
+}
 
   resumen = signal<DashboardResumen | null>(null);
-  proximosVencimientos = signal<Cliente[]>([]);
-  deudoresConCorte = signal<Cliente[]>([]);
   cargando = signal<boolean>(true);
 
   // ---- datos formateados para ngx-charts ----

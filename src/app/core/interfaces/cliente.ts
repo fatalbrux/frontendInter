@@ -15,6 +15,7 @@ export interface Cliente {
   nombres: string;
   apellidos: string;
   ci: string;
+  usuario?: string | null;
   telefono: string;
   direccion: string;
   email: string;
@@ -36,6 +37,7 @@ export interface ClientePayload {
   nombres?: string;
   apellidos?: string;
   ci?: string;
+  usuario?: string | null;
   telefono?: string;
   email?: string;
   direccion?: string;

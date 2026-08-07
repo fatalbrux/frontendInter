@@ -1,4 +1,6 @@
 export type MetodoPago = 'Efectivo' | 'Código QR';
+export type BancoPago = 'Banco Unión' | 'Banco BNB' | 'Banco Prodem' | 'Tigo Money';
+
 export interface ClienteResumenPago {
   id: number;
   nombres: string;
@@ -16,6 +18,7 @@ export interface Pago {
   mesesPagados: number;
   monto: number;
   metodoPago: string;
+  banco?: BancoPago;
   vencimientoAnterior: Date | null;
   nuevoVencimiento: Date | null;
   notas: string;
@@ -29,6 +32,7 @@ export interface PagoPayload {
   mesesPagados: number;
   monto: number;
   metodoPago: MetodoPago;
+  banco?: BancoPago;
   vencimientoAnterior?: Date;
   nuevoVencimiento?: Date;
   notas?: string;
