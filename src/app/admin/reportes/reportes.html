@@ -1,0 +1,44 @@
+<div class="p-6">
+  <h1 class="text-2xl font-bold text-gray-800">Reportes</h1>
+  <p class="text-xs text-gray-400 mb-6">Generación y exportación de reportes del sistema</p>
+
+  @if (!cargando() && resumen(); as res) {
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+      <div class="bg-white rounded-xl shadow p-4">
+        <div class="flex justify-between items-center mb-2">
+          <p class="font-semibold text-gray-800">Ingresos por Mes</p>
+          <p class="font-bold text-red-600">Bs. {{ res.ingresosAno }}</p>
+        </div>
+        <ngx-charts-bar-vertical
+          [results]="datosIngresosMensuales()"
+          [xAxis]="true" [yAxis]="true"
+          [scheme]="colorScheme"
+          [view]="[500, 250]">
+        </ngx-charts-bar-vertical>
+      </div>
+      <div class="bg-white rounded-xl shadow p-4">
+        <p class="font-semibold text-gray-800 mb-2">Clientes por Zona</p>
+        <ngx-charts-bar-horizontal
+          [results]="datosClientesPorZona()"
+          [xAxis]="true" [yAxis]="true"
+          [scheme]="colorScheme"
+          [view]="[500, 250]">
+        </ngx-charts-bar-horizontal>
+      </div>
+    </div>
+  }
+
+  <p class="font-semibold text-gray-800 mb-3">Generar y Exportar Reportes</p>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+    @for (rep of reportes; track rep.titulo) {
+      <div class="bg-white rounded-xl shadow p-4">
+        <p class="font-semibold text-gray-800 mb-3">{{ rep.icono }} {{ rep.titulo }}</p>
+        <div class="flex gap-2">
+          <button (click)="generarPdf(rep)" class="text-xs px-2 py-1 rounded-lg bg-rose-50 text-rose-600">PDF</button>
+          <button (click)="generarExcel(rep)" class="text-xs px-2 py-1 rounded-lg bg-emerald-50 text-emerald-600">Excel</button>
+          <button (click)="imprimir(rep)" class="text-xs px-2 py-1 rounded-lg bg-indigo-50 text-indigo-600">Imprimir</button>
+        </div>
+      </div>
+    }
+  </div>
+</div>

@@ -59,7 +59,7 @@ export class AdminLayout {
       { label: 'Cobros', route: '/admin/pagos', icon: this.trust(ICONS.cobros) },
       { label: 'Instalaciones', route: '/admin/instalaciones', icon: this.trust(ICONS.instalaciones) },
       { label: 'Zonas', route: '/admin/zonas', icon: this.trust(ICONS.zonas) },
-      { label: 'Morosos', route: '/admin/clientes', icon: this.trust(ICONS.morosos), badge: 4 },
+      { label: 'Morosos', route: '/admin/morosos', icon: this.trust(ICONS.morosos), badge: 4 },
       { label: 'Reportes', route: '/admin/reportes', icon: this.trust(ICONS.reportes) },
       
     ];
