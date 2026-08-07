@@ -1,12 +1,14 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EquiposService } from '../../core/services/equipos';
 import { MarcasService } from '../../core/services/marcas';
 import { TiposEquipoService } from '../../core/services/tipos-equipo';
-import { Equipo } from '../../core/interfaces/equipo';
+import { ClienteResumen, Equipo } from '../../core/interfaces/equipo';
 import { Marca } from '../../core/interfaces/marca';
 import { TipoEquipo } from '../../core/interfaces/tipo-equipo';
+import { ClientesService } from '../../core/services/clientes';
+import { Cliente } from '../../core/interfaces/cliente';
 
 @Component({
   selector: 'app-equipos',
@@ -19,6 +21,8 @@ export class Equipos implements OnInit {
   private readonly marcasService = inject(MarcasService);
   private readonly tiposEquipoService = inject(TiposEquipoService);
 
+  private readonly clientesService = inject(ClientesService);
+  listaClientes = signal<Cliente[]>([]);
   // ================= EQUIPOS =================
   listaEquipos = signal<Equipo[]>([]);
   mostrarModal = signal<boolean>(false);
@@ -26,6 +30,8 @@ export class Equipos implements OnInit {
   modoEdicion = signal<boolean>(false);
   idSeleccionado = signal<number | null>(null);
   idEquipoAEliminar: number | null = null;
+  busquedaClienteEquipo = signal<string>('');
+  clienteSeleccionadoEquipo = signal<ClienteResumen | null>(null);
 
   formulario: Partial<Equipo> = {
     codigo: '',
@@ -37,7 +43,8 @@ export class Equipos implements OnInit {
     pppoePassword: '',
     estado: 'Disponible',
     tipoEquipoId: undefined,
-    marcaId: undefined
+    marcaId: undefined,
+    clienteId: undefined
   };
 
   // ---------- MARCAS ----------
@@ -62,7 +69,46 @@ export class Equipos implements OnInit {
     this.listarEquipos();
     this.listarMarcas();
     this.listarTiposEquipo();
+    this.listarClientes(); // nuevo
+    this.listarClientesEquipo();
   }
+
+  listarClientes(): void {
+  this.clientesService.funListar().subscribe({
+    next: (res) => this.listaClientes.set(res),
+    error: (err) => console.error(err)
+  });
+}
+
+listarClientesEquipo(): void {
+  this.clientesService.funListar().subscribe({
+    next: (res) => this.listaClientes.set(res),
+    error: (err) => console.error(err)
+  });
+}
+
+clientesEncontradosEquipo = computed(() => {
+  const texto = this.busquedaClienteEquipo().trim().toLowerCase();
+  if (!texto) return [];
+  return this.listaClientes()
+    .filter(c =>
+      c.ci?.toLowerCase().includes(texto) ||
+      `${c.nombres} ${c.apellidos}`.toLowerCase().includes(texto)
+    )
+    .slice(0, 8);
+});
+
+seleccionarClienteEquipo(cliente: Cliente): void {
+  this.clienteSeleccionadoEquipo.set(cliente);
+  this.formulario.clienteId = cliente.id;
+  this.busquedaClienteEquipo.set('');
+}
+
+quitarClienteEquipo(): void {
+  this.clienteSeleccionadoEquipo.set(null);
+  this.formulario.clienteId = undefined;
+  this.busquedaClienteEquipo.set('');
+}
 
   // ================= EQUIPOS =================
   listarEquipos(): void {
@@ -75,6 +121,8 @@ export class Equipos implements OnInit {
   abrirModalCrear(): void {
     this.modoEdicion.set(false);
     this.idSeleccionado.set(null);
+  this.clienteSeleccionadoEquipo.set(null);   // nuevo
+  this.busquedaClienteEquipo.set('');          // nuevo
     this.formulario = {
       codigo: '',
       modelo: '',
@@ -85,7 +133,8 @@ export class Equipos implements OnInit {
       pppoePassword: '',
       estado: 'Disponible',
       tipoEquipoId: undefined,
-      marcaId: undefined
+      marcaId: undefined,
+      clienteId: undefined
     };
     this.mostrarModal.set(true);
   }
@@ -93,6 +142,8 @@ export class Equipos implements OnInit {
   seleccionarParaEditar(equipo: Equipo): void {
     this.modoEdicion.set(true);
     this.idSeleccionado.set(equipo.id ?? null);
+  this.clienteSeleccionadoEquipo.set(equipo.cliente ?? null);  // nuevo
+  this.busquedaClienteEquipo.set('');                           // nuevo
     this.formulario = {
       codigo: equipo.codigo,
       modelo: equipo.modelo,
@@ -103,7 +154,8 @@ export class Equipos implements OnInit {
       pppoePassword: equipo.pppoePassword,
       estado: equipo.estado,
       tipoEquipoId: equipo.tipoEquipoId,
-      marcaId: equipo.marcaId
+      marcaId: equipo.marcaId,
+      clienteId: equipo.clienteId ?? undefined, // nuevo
     };
     this.mostrarModal.set(true);
   }

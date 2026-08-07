@@ -91,7 +91,8 @@
         <tr *ngFor="let equipo of listaEquipos()" class="border-b last:border-0 hover:bg-gray-50">
           <td class="py-3 px-4 text-red-600 font-medium">{{ equipo.codigo }}</td>
           <td class="py-3 px-4">
-            <p class="text-gray-800">{{ nombreMarca(equipo.marcaId) }}</p>
+            
+<p class="text-gray-800">{{ equipo.marca?.nombre ?? '—' }}</p>
             <p class="text-gray-400 text-xs">{{ equipo.modelo }}</p>
           </td>
           <td class="py-3 px-4 text-gray-600">{{ equipo.nroSerie }}</td>
@@ -101,7 +102,7 @@
             <p class="text-gray-800">{{ equipo.pppoeUsuario || '—' }}</p>
             <p class="text-gray-400 text-xs">{{ equipo.pppoePassword || '—' }}</p>
           </td>
-          <td class="py-3 px-4 text-gray-600">{{ nombreTipoEquipo(equipo.tipoEquipoId) }}</td>
+          <td class="py-3 px-4 text-gray-600">{{ equipo.tipoEquipo?.nombre ?? '—' }}</td>
           <td class="py-3 px-4">
             <span class="text-xs px-2 py-0.5 rounded-full"
               [ngClass]="{
@@ -167,6 +168,35 @@
           <option *ngFor="let tipo of listaTiposEquipo()" [ngValue]="tipo.id">{{ tipo.nombre }}</option>
         </select>
       </div>
+
+      <div class="mb-4">
+  <label class="block text-sm text-gray-600 mb-1">Cliente (opcional)</label>
+
+  <!-- si ya hay cliente seleccionado, muestra el chip -->
+  <div *ngIf="clienteSeleccionadoEquipo() as cli"
+       class="flex items-center justify-between border rounded-lg px-3 py-2 bg-gray-50 text-sm">
+    <span class="text-gray-800">{{ cli.nombres }} {{ cli.apellidos }} — CI: {{ cli.ci }}</span>
+    <button (click)="quitarClienteEquipo()" class="text-xs text-red-600 hover:underline">Quitar</button>
+  </div>
+
+  <!-- si no hay cliente seleccionado, muestra el buscador -->
+  <div *ngIf="!clienteSeleccionadoEquipo()">
+    <input type="text" [(ngModel)]="busquedaClienteEquipo"
+      placeholder="Buscar por CI o nombre..."
+      name="busquedaClienteEquipo"
+      class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500" />
+
+    <div *ngIf="clientesEncontradosEquipo().length > 0"
+         class="border rounded-lg mt-1 max-h-40 overflow-y-auto bg-white shadow-sm">
+      <div *ngFor="let cliente of clientesEncontradosEquipo()"
+        (click)="seleccionarClienteEquipo(cliente)"
+        class="px-3 py-2 text-sm hover:bg-gray-50 cursor-pointer border-b last:border-0">
+        <p class="text-gray-800">{{ cliente.nombres }} {{ cliente.apellidos }}</p>
+        <p class="text-gray-400 text-xs">CI: {{ cliente.ci }}</p>
+      </div>
+    </div>
+  </div>
+</div>
     </div>
 
     <div class="grid grid-cols-2 gap-4 mb-4">
