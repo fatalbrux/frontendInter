@@ -27,6 +27,27 @@ export interface ClienteMoroso {
   estado: string;
 }
 
+
+export interface ProximoVencimiento {
+  id: number;
+  codigo: string;
+  nombres: string;
+  apellidos: string;
+  zona: string | null;
+  proximoVencimiento: string;
+  precioMensual: number;
+}
+
+export interface DeudorCorte {
+  id: number;
+  codigo: string;
+  nombres: string;
+  apellidos: string;
+  zona: string | null;
+  mesesDeuda: number;
+  deudaTotal: number;
+}
+
 export interface DashboardResumen {
   totalClientes: number;
   clientesActivos: number;

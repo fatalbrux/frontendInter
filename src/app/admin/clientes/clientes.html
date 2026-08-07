@@ -177,9 +177,14 @@
               <input type="text" [(ngModel)]="formulario.apellidos" name="apellidos" placeholder="Ej. Mendoza Torrez" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
             </div>
             <div>
-              <label class="block text-xs font-semibold text-gray-600 mb-1">Cédula de Identidad</label>
+              <label class="block text-xs font-semibold text-gray-600 mb-1">Cédula de Identidad (opcional)</label>
               <input type="text" [(ngModel)]="formulario.ci" name="ci" placeholder="Ej. 5847291" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
             </div>
+            <div>
+  <label class="block text-xs font-semibold text-gray-600 mb-1">Usuario</label>
+  <input type="text" [(ngModel)]="formulario.usuario" name="usuario" placeholder="Ej. user70"
+    class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
+</div>
             <div>
               <label class="block text-xs font-semibold text-gray-600 mb-1">Teléfono</label>
               <input type="text" [(ngModel)]="formulario.telefono" name="telefono" placeholder="Ej. 71234567" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
@@ -289,7 +294,7 @@
               <span class="text-sm font-semibold text-red-500"> — Bs. {{ clienteParaPago()?.plan?.precioMensual }} / mes</span>
             }
           </p>
-          <p class="text-[11px] text-red-400 mt-0.5">Próximo vencimiento: {{ vencimientoPreview() }}</p>
+          <p class="text-[11px] text-red-400 mt-0.5">Cobrar a partir del: {{ clienteParaPago() ? fechaVencimientoDisplay(clienteParaPago()!) : '—' }}</p>
         </div>
 
         <div>
@@ -302,6 +307,7 @@
             <option [ngValue]="6">6 meses</option>
             <option [ngValue]="12">12 meses</option>
           </select>
+          <p class="text-[11px] text-gray-500 mt-1">El pago cubre hasta: {{ vencimientoPreview() }}</p>
         </div>
 
         <div>
@@ -312,6 +318,21 @@
             <option value="Código QR">Código QR</option>
           </select>
         </div>
+
+    @if (formularioPago.metodoPago === 'Código QR') {
+  <div>
+    <label class="block text-xs font-semibold text-gray-600 mb-2">Banco / Billetera</label>
+    <div class="grid grid-cols-2 gap-2">
+      @for (banco of bancosDisponibles; track banco) {
+        <button type="button" (click)="bancoSeleccionado.set(banco)"
+          class="border rounded-xl py-2 text-xs font-semibold transition-colors"
+          [ngClass]="bancoSeleccionado() === banco ? 'border-red-500 text-red-600 bg-red-50' : 'border-gray-200 text-gray-600'">
+          {{ banco }}
+        </button>
+      }
+    </div>
+  </div>
+}
 
         <div>
           <label class="block text-xs font-semibold text-gray-600 mb-1">Fecha de pago</label>
