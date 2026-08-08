@@ -2,10 +2,11 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Ciudad } from '../interfaces/ciudad';
+import { environment } from '../../../environments/environment.development';
 
 @Injectable({ providedIn: 'root' })
 export class CiudadesService {
-  private readonly urlBase = 'http://localhost:3000/ciudad';
+  private readonly urlBase = `${environment.apiUrl}/ciudad`;
   private readonly http = inject(HttpClient);
 
   funListar(): Observable<Ciudad[]> {

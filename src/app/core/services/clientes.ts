@@ -2,10 +2,11 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Cliente } from '../interfaces/cliente';
+import { environment } from '../../../environments/environment.development';
 
 @Injectable({ providedIn: 'root' })
 export class ClientesService {
-  private readonly urlBase='http://localhost:3000/cliente';
+  private readonly urlBase=`${environment.apiUrl}/cliente`;
   private readonly http=inject(HttpClient);
 
   funListar():Observable<Cliente[]>{
