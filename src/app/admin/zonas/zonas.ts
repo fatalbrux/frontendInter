@@ -5,6 +5,9 @@ import { ZonasService } from '../../core/services/zonas';
 import { CiudadesService } from '../../core/services/ciudades';
 import { Zona } from '../../core/interfaces/zona';
 import { Ciudad } from '../../core/interfaces/ciudad';
+import { NotificacionesService } from '../../core/services/notificaciones';
+
+
 
 @Component({
   selector: 'app-zonas',
@@ -15,6 +18,7 @@ import { Ciudad } from '../../core/interfaces/ciudad';
 export class Zonas implements OnInit {
   private readonly zonasService = inject(ZonasService);
   private readonly ciudadesService = inject(CiudadesService);
+  private readonly notificaciones = inject(NotificacionesService);
 
   // ---------- CIUDADES ----------
   listaCiudades = signal<Ciudad[]>([]);
@@ -74,12 +78,16 @@ export class Zonas implements OnInit {
   guardarCiudad(): void {
     if (this.modoEdicionCiudad() && this.idCiudadSeleccionada() !== null) {
       this.ciudadesService.funEditar(this.formularioCiudad, this.idCiudadSeleccionada()!).subscribe({
-        next: () => this.reiniciarYRefrescarCiudad(),
+        next: () => {
+          this.notificaciones.exito('Ciudad actualizada exitosamente');
+          this.reiniciarYRefrescarCiudad()},
         error: (err) => console.error(err)
       });
     } else {
       this.ciudadesService.funGuardar(this.formularioCiudad).subscribe({
-        next: () => this.reiniciarYRefrescarCiudad(),
+        next: () => {
+          this.notificaciones.exito('Ciudad creada exitosamente');
+          this.reiniciarYRefrescarCiudad()},
         error: (err) => console.error(err)
       });
     }
@@ -94,6 +102,7 @@ export class Zonas implements OnInit {
     if (this.idCiudadAEliminar !== null) {
       this.ciudadesService.funEliminar(this.idCiudadAEliminar).subscribe({
         next: () => {
+          this.notificaciones.exito('Ciudad eliminada exitosamente');
           this.mostrarConfirmarEliminarCiudad.set(false);
           this.idCiudadAEliminar = null;
           this.listarCiudades();
@@ -148,12 +157,16 @@ export class Zonas implements OnInit {
   guardarZona(): void {
     if (this.modoEdicionZona() && this.idZonaSeleccionada() !== null) {
       this.zonasService.funEditar(this.formularioZona, this.idZonaSeleccionada()!).subscribe({
-        next: () => this.reiniciarYRefrescarZona(),
+        next: () => {
+          this.notificaciones.exito('Zona actualizada exitosamente');
+          this.reiniciarYRefrescarZona()},     
         error: (err) => console.error(err)
       });
     } else {
       this.zonasService.funGuardar(this.formularioZona).subscribe({
-        next: () => this.reiniciarYRefrescarZona(),
+        next: () => {
+          this.notificaciones.exito('Zona creada exitosamente');
+          this.reiniciarYRefrescarZona()},  
         error: (err) => console.error(err)
       });
     }
@@ -176,6 +189,7 @@ export class Zonas implements OnInit {
     if (this.idZonaAEliminar !== null) {
       this.zonasService.funEliminar(this.idZonaAEliminar).subscribe({
         next: () => {
+          this.notificaciones.exito('Zona eliminada exitosamente');
           this.mostrarConfirmarEliminarZona.set(false);
           this.idZonaAEliminar = null;
           this.listarZonas();

@@ -9,6 +9,8 @@ import { Instalacion } from '../../core/interfaces/instalacion';
 import { Cliente } from '../../core/interfaces/cliente';
 import { Equipo } from '../../core/interfaces/equipo';
 import { Zona } from '../../core/interfaces/zona';
+import { ClienteResumen, EquipoResumen } from '../../core/interfaces/instalacion';
+import { NotificacionesService } from '../../core/services/notificaciones';
 
 @Component({
   selector: 'app-instalaciones',
@@ -18,6 +20,7 @@ import { Zona } from '../../core/interfaces/zona';
 })
 export class Instalaciones implements OnInit {
   private readonly instalacionesService = inject(InstalacionesService);
+  private readonly notificaciones = inject(NotificacionesService);
   private readonly clientesService = inject(ClientesService);
   private readonly equiposService = inject(EquiposService);
   private readonly zonasService = inject(ZonasService);
@@ -38,27 +41,41 @@ export class Instalaciones implements OnInit {
 
   // ---- búsqueda de cliente por CI ----
   busquedaCi = signal<string>('');
-  clienteSeleccionado = signal<Cliente | null>(null);
+  //clienteSeleccionado = signal<Cliente | null>(null);
+
+  clienteSeleccionado = signal<Cliente | ClienteResumen | null>(null);
 
   clientesEncontrados = computed(() => {
-    const texto = this.busquedaCi().trim().toLowerCase();
-    if (!texto) return [];
-    return this.listaClientes()
-      .filter(c => c.ci?.toLowerCase().includes(texto))
-      .slice(0, 8);
-  });
+  const texto = this.busquedaCi().trim().toLowerCase();
+  if (!texto) return [];
+  return this.listaClientes()
+    .filter(c =>
+      c.ci?.toLowerCase().includes(texto) ||
+      c.codigo?.toLowerCase().includes(texto) ||
+      c.usuario?.toLowerCase().includes(texto) ||
+      `${c.nombres} ${c.apellidos}`.toLowerCase().includes(texto)
+    )
+    .slice(0, 8);
+});
 
   // ---- búsqueda de equipo por código ----
   busquedaCodigoEquipo = signal<string>('');
-  equipoSeleccionado = signal<Equipo | null>(null);
+  //equipoSeleccionado = signal<Equipo | null>(null);
+
+  equipoSeleccionado = signal<Equipo | EquipoResumen | null>(null);
 
   equiposEncontrados = computed(() => {
-    const texto = this.busquedaCodigoEquipo().trim().toLowerCase();
-    if (!texto) return [];
-    return this.equiposDisponibles()
-      .filter(e => e.codigo?.toLowerCase().includes(texto))
-      .slice(0, 8);
-  });
+  const texto = this.busquedaCodigoEquipo().trim().toLowerCase();
+  if (!texto) return [];
+  return this.equiposDisponibles()
+    .filter(e =>
+      e.codigo?.toLowerCase().includes(texto) ||
+      e.modelo?.toLowerCase().includes(texto) ||
+      e.nroSerie?.toLowerCase().includes(texto) ||
+      e.mac?.toLowerCase().includes(texto)
+    )
+    .slice(0, 8);
+});
 
   fechaInstalacion: string = this.formatearInputDate(new Date());
   zonaIdSeleccionada = signal<number | undefined>(undefined);
@@ -136,24 +153,21 @@ export class Instalaciones implements OnInit {
     this.mostrarModal.set(true);
   }
 
-  seleccionarParaEditar(instalacion: Instalacion): void {
-    this.modoEdicion.set(true);
-    this.idSeleccionado.set(instalacion.id);
+seleccionarParaEditar(instalacion: Instalacion): void {
+  this.modoEdicion.set(true);
+  this.idSeleccionado.set(instalacion.id);
 
-    const cliente = this.listaClientes().find(c => c.id === instalacion.clienteId) ?? null;
-    const equipo = this.listaEquipos().find(e => e.id === instalacion.equipoId) ?? null;
+  this.busquedaCi.set('');
+  this.clienteSeleccionado.set(instalacion.cliente ?? null);
+  this.busquedaCodigoEquipo.set('');
+  this.equipoSeleccionado.set(instalacion.equipo ?? null); // ya no necesitas "as any"
+  this.fechaInstalacion = this.formatearInputDate(new Date(instalacion.fechaInstalacion));
+  this.zonaIdSeleccionada.set(instalacion.zona?.id);
+  this.direccion.set(instalacion.direccion ?? '');
+  this.observaciones.set(instalacion.observaciones ?? '');
 
-    this.busquedaCi.set('');
-    this.clienteSeleccionado.set(cliente);
-    this.busquedaCodigoEquipo.set('');
-    this.equipoSeleccionado.set(equipo);
-    this.fechaInstalacion = this.formatearInputDate(new Date(instalacion.fechaInstalacion));
-    this.zonaIdSeleccionada.set(instalacion.zonaId);
-    this.direccion.set(instalacion.direccion ?? '');
-    this.observaciones.set(instalacion.observaciones ?? '');
-
-    this.mostrarModal.set(true);
-  }
+  this.mostrarModal.set(true);
+}
 
   cerrarModal(): void {
     this.mostrarModal.set(false);
@@ -199,12 +213,17 @@ export class Instalaciones implements OnInit {
 
     if (this.modoEdicion() && this.idSeleccionado() !== null) {
       this.instalacionesService.funEditar(dato, this.idSeleccionado()!).subscribe({
-        next: () => this.reiniciarYRefrescar(),
+        next: () => { 
+          this.notificaciones.exito('Instalacion actualizado exitosamente');
+          this.reiniciarYRefrescar()},
         error: (err) => console.error(err)
       });
     } else {
       this.instalacionesService.funGuardar(dato).subscribe({
-        next: () => this.reiniciarYRefrescar(),
+        next: () => {
+          
+          this.notificaciones.exito('Instalacion registrado exitosamente');
+          this.reiniciarYRefrescar()},
         error: (err) => console.error(err)
       });
     }
@@ -221,6 +240,7 @@ export class Instalaciones implements OnInit {
         next: () => {
           this.mostrarConfirmarEliminar.set(false);
           this.idInstalacionAEliminar = null;
+          this.notificaciones.exito('Instalacion eliminado exitosamente');
           this.listarInstalaciones();
         },
         error: (err) => console.error(err)

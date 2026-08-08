@@ -7,6 +7,7 @@ import { PlanesService } from '../../core/services/planes';
 import { BancoPago, MetodoPago, Pago, PagoPayload } from '../../core/interfaces/pago';
 import { Cliente } from '../../core/interfaces/cliente';
 import { Plan } from '../../core/interfaces/plan';
+import { NotificacionesService } from '../../core/services/notificaciones';
 
 @Component({
   selector: 'app-pagos',
@@ -16,6 +17,7 @@ import { Plan } from '../../core/interfaces/plan';
 })
 export class Pagos implements OnInit {
   private readonly pagosService = inject(PagosService);
+  private readonly notificaciones = inject(NotificacionesService);
   private readonly clientesService = inject(ClientesService);
   private readonly planesService = inject(PlanesService);
   private parseFechaLocal(fecha: string | Date): Date {
@@ -216,6 +218,7 @@ puedeRegistrarPago(cliente: Cliente | null): boolean {
       next: () => {
         this.mostrarModal.set(false);
         this.listarPagos();
+        this.notificaciones.exito('Pago registrado exitosamente');
         this.listarClientes(); // refresca próximo vencimiento del cliente
       },
       error: (err) => console.error(err)

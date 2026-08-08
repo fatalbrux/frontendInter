@@ -84,7 +84,7 @@
           <div class="mb-4">
             <label class="block text-xs font-semibold text-gray-600 mb-1">Cliente (buscar por CI)</label>
             <input type="text" [ngModel]="busquedaCi()" (ngModelChange)="busquedaCi.set($event)"
-              placeholder="Escribe el carnet de identidad..."
+              placeholder="Escribe el CI, nombres, código o usuario..."
               class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500" />
 
             @if (clientesEncontrados().length > 0) {
@@ -123,7 +123,7 @@
           <div class="mb-4">
             <label class="block text-xs font-semibold text-gray-600 mb-1">Equipo a instalar (buscar por código)</label>
             <input type="text" [ngModel]="busquedaCodigoEquipo()" (ngModelChange)="busquedaCodigoEquipo.set($event)"
-              placeholder="Ej: RT-003"
+              placeholder="Escribe el codigo, serie o modelo"
               class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500" />
 
             @if (equiposEncontrados().length > 0) {
