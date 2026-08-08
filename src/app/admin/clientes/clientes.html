@@ -25,25 +25,38 @@
 
     <!-- Filtros -->
     <div class="p-4 border-b border-gray-100 flex items-center justify-between gap-4">
-      <div class="relative flex-1">
-        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-gray-400">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-        </span>
-        <input type="text" placeholder="Buscar por nombre, CI, código, teléfono..." class="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all">
-      </div>
+  <div class="relative flex-1">
+    <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-gray-400">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      </svg>
+    </span>
+    <input type="text" [ngModel]="busquedaTexto()" (ngModelChange)="busquedaTexto.set($event)"
+      placeholder="Buscar por nombre, CI, código, teléfono..."
+      class="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all">
+  </div>
 
-      <div class="flex items-center gap-3">
-        <select class="bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-600 py-2 px-3 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
-          <option value="">Todos</option>
-        </select>
-        <select class="bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-600 py-2 px-3 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
-          <option value="">Todos</option>
-        </select>
-        <span class="text-xs font-medium text-gray-500 bg-gray-50 px-3 py-2 rounded-xl border border-gray-200">{{ listaClientes().length }} resultado(s)</span>
-      </div>
-    </div>
+  <div class="flex items-center gap-3">
+    <select [ngModel]="filtroZonaId()" (ngModelChange)="filtroZonaId.set($event)"
+      class="bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-600 py-2 px-3 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
+      <option [ngValue]="'Todos'">Todas las zonas</option>
+      @for (z of listaZonas(); track z.id) {
+        <option [ngValue]="z.id">{{ z.nombre }}</option>
+      }
+    </select>
+
+    <select [ngModel]="filtroEstado()" (ngModelChange)="filtroEstado.set($event)"
+      class="bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-600 py-2 px-3 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
+      <option value="Todos">Todos los estados</option>
+      <option value="Activo">Activo</option>
+      <option value="Suspendido">Suspendido</option>
+      <option value="Corte de servicio">Corte de servicio</option>
+      <option value="Moroso">Moroso</option>
+    </select>
+
+    <span class="text-xs font-medium text-gray-500 bg-gray-50 px-3 py-2 rounded-xl border border-gray-200">{{ clientesFiltrados().length }} resultado(s)</span>
+  </div>
+</div>
 
     <!-- Tabla de Clientes -->
     <div class="overflow-x-auto">
@@ -53,6 +66,7 @@
             <th class="py-3.5 px-4">Código</th>
             <th class="py-3.5 px-4">Nombre</th>
             <th class="py-3.5 px-4">CI</th>
+            <th class="py-3.5 px-4">Usuario</th>
             <th class="py-3.5 px-4">Teléfono</th>
             <th class="py-3.5 px-4">Zona</th>
             <th class="py-3.5 px-4">Estado</th>
@@ -64,7 +78,7 @@
           @if (cargando()) {
             <tr><td colspan="8" class="text-center py-6 text-gray-400 font-medium">Cargando...</td></tr>
           } @else {
-            @for (item of listaClientes(); track item.id) {
+            @for (item of clientesFiltrados(); track item.id) {
               <tr class="hover:bg-gray-50/80 transition-colors">
                 <td class="py-3 px-4 font-bold text-red-600 whitespace-nowrap">{{ item.codigo }}</td>
                 <td class="py-3 px-4">
@@ -72,6 +86,7 @@
                   <div class="text-[11px] text-gray-400">{{ item.direccion }}</div>
                 </td>
                 <td class="py-3 px-4 font-medium text-gray-600">{{ item.ci }}</td>
+                <td class="py-3 px-4 font-medium text-gray-600">{{ item.usuario || '—' }}</td>
                 <td class="py-3 px-4 font-medium text-gray-600">{{ item.telefono }}</td>
                 <td class="py-3 px-4 font-medium text-gray-600">{{ item.zona?.nombre || '—' }}</td>
                 <td class="py-3 px-4">
@@ -203,11 +218,11 @@
             <div>
               <label class="block text-xs font-semibold text-gray-600 mb-1">Zona</label>
               <select [(ngModel)]="formulario.zonaId" name="zonaId" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
-                <option [ngValue]="undefined">— Seleccionar zona —</option>
-                @for (z of listaZonas(); track z.id) {
-                  <option [ngValue]="z.id">{{ z.nombre }}</option>
-                }
-              </select>
+  <option [ngValue]="undefined">— Seleccionar zona —</option>
+  @for (z of zonasParaFormulario(); track z.id) {
+    <option [ngValue]="z.id">{{ z.nombre }}{{ z.estado !== 'Activa' ? ' (inactiva)' : '' }}</option>
+  }
+</select>
             </div>
             <div>
               <label class="block text-xs font-semibold text-gray-600 mb-1">Dirección</label>
@@ -234,12 +249,12 @@
             </div>
             <div>
               <label class="block text-xs font-semibold text-gray-600 mb-1">Plan</label>
-              <select [(ngModel)]="formulario.planId" name="planId" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
-                <option [ngValue]="undefined">— Seleccionar plan —</option>
-                @for (p of listaPlanes(); track p.id) {
-                  <option [ngValue]="p.id">{{ p.nombre }} — Bs. {{ p.precioMensual }}</option>
-                }
-              </select>
+             <select [(ngModel)]="formulario.planId" name="planId" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
+  <option [ngValue]="undefined">— Seleccionar plan —</option>
+  @for (p of planesParaFormulario(); track p.id) {
+    <option [ngValue]="p.id">{{ p.nombre }} — Bs. {{ p.precioMensual }}{{ p.estado !== 'Activo' ? ' (inactivo)' : '' }}</option>
+  }
+</select>
             </div>
             <div>
               <label class="block text-xs font-semibold text-gray-600 mb-1">Estado</label>
@@ -272,32 +287,34 @@
 
 <!-- Modal: Registrar Pago (rápido, desde el listado) -->
 @if (mostrarModalPago()) {
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden my-8">
 
       <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-        <h2 class="text-lg font-bold text-gray-800">
+        <h3 class="text-base font-bold text-gray-800">
           Registrar Pago — {{ clienteParaPago()?.nombres }} {{ clienteParaPago()?.apellidos }}
-        </h2>
+        </h3>
         <button (click)="cerrarModalPago()" class="text-gray-400 hover:text-gray-600 p-1 rounded-lg">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
       </div>
 
-      <form (ngSubmit)="guardarPago()" class="p-6 space-y-4">
+      <form (ngSubmit)="guardarPago()" class="p-6 max-h-[75vh] overflow-y-auto">
 
-        <div class="rounded-xl bg-red-50 border border-red-100 px-4 py-3">
-          <p class="text-[10px] font-bold text-red-400 uppercase tracking-wider">Plan actual</p>
-          <p class="text-lg font-bold text-red-700">
+        <div class="rounded-xl bg-red-50 border border-red-100 px-4 py-3 mb-4">
+          <p class="text-[10px] font-bold text-red-400 uppercase tracking-wider">Plan actual · Cobrar a partir del</p>
+          <p class="text-base font-bold text-red-700">
             {{ clienteParaPago()?.plan?.nombre || 'Sin plan asignado' }}
             @if (clienteParaPago()?.plan) {
               <span class="text-sm font-semibold text-red-500"> — Bs. {{ clienteParaPago()?.plan?.precioMensual }} / mes</span>
             }
           </p>
-          <p class="text-[11px] text-red-400 mt-0.5">Cobrar a partir del: {{ clienteParaPago() ? fechaVencimientoDisplay(clienteParaPago()!) : '—' }}</p>
+          <p class="text-[11px] text-red-500 mt-1 font-semibold">
+            {{ clienteParaPago() ? fechaVencimientoDisplay(clienteParaPago()!) : '—' }}
+          </p>
         </div>
 
-        <div>
+        <div class="mb-4">
           <label class="block text-xs font-semibold text-gray-600 mb-1">Meses a pagar</label>
           <select [(ngModel)]="formularioPago.mesesPagados" name="mesesPagados" (ngModelChange)="actualizarMontoPorMeses()"
             class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
@@ -307,51 +324,64 @@
             <option [ngValue]="6">6 meses</option>
             <option [ngValue]="12">12 meses</option>
           </select>
-          <p class="text-[11px] text-gray-500 mt-1">El pago cubre hasta: {{ vencimientoPreview() }}</p>
+          <p class="text-[11px] text-gray-500 mt-1">El pago cubre hasta el: {{ vencimientoPreview() }}</p>
         </div>
 
-        <div>
-          <label class="block text-xs font-semibold text-gray-600 mb-1">Método de pago</label>
-          <select [(ngModel)]="formularioPago.metodoPago" name="metodoPago"
-            class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
-            <option value="Efectivo">Efectivo</option>
-            <option value="Código QR">Código QR</option>
-          </select>
+        <div class="mb-4">
+          <label class="block text-xs font-semibold text-gray-600 mb-2">Método de pago</label>
+          <div class="grid grid-cols-2 gap-3">
+            <button type="button" (click)="formularioPago.metodoPago = 'Efectivo'"
+              class="border rounded-xl py-2 text-xs font-semibold transition-colors"
+              [ngClass]="formularioPago.metodoPago === 'Efectivo' ? 'border-red-500 text-red-600 bg-red-50' : 'border-gray-200 text-gray-600'">
+              Efectivo
+            </button>
+            <button type="button" (click)="formularioPago.metodoPago = 'Código QR'"
+              class="border rounded-xl py-2 text-xs font-semibold transition-colors"
+              [ngClass]="formularioPago.metodoPago === 'Código QR' ? 'border-red-500 text-red-600 bg-red-50' : 'border-gray-200 text-gray-600'">
+              Código QR
+            </button>
+          </div>
         </div>
 
-    @if (formularioPago.metodoPago === 'Código QR') {
-  <div>
-    <label class="block text-xs font-semibold text-gray-600 mb-2">Banco / Billetera</label>
-    <div class="grid grid-cols-2 gap-2">
-      @for (banco of bancosDisponibles; track banco) {
-        <button type="button" (click)="bancoSeleccionado.set(banco)"
-          class="border rounded-xl py-2 text-xs font-semibold transition-colors"
-          [ngClass]="bancoSeleccionado() === banco ? 'border-red-500 text-red-600 bg-red-50' : 'border-gray-200 text-gray-600'">
-          {{ banco }}
-        </button>
-      }
-    </div>
-  </div>
-}
+        @if (formularioPago.metodoPago === 'Código QR') {
+          <div class="mb-4">
+            <label class="block text-xs font-semibold text-gray-600 mb-2">Banco / Billetera</label>
+            <div class="grid grid-cols-2 gap-3">
+              @for (banco of bancosDisponibles; track banco) {
+                <button type="button" (click)="bancoSeleccionado.set(banco)"
+                  class="border rounded-xl py-2.5 text-xs font-semibold transition-colors"
+                  [ngClass]="{
+                    'border-red-500 ring-1 ring-red-500': bancoSeleccionado() === banco,
+                    'border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100': banco === 'Banco Unión',
+                    'border-teal-200 bg-teal-50 text-teal-700 hover:bg-teal-100': banco === 'Banco Prodem',
+                    'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100': banco === 'Banco BNB',
+                    'border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100': banco === 'Tigo Money'
+                  }">
+                  {{ banco }}
+                </button>
+              }
+            </div>
+          </div>
+        }
 
-        <div>
+        <div class="mb-4">
           <label class="block text-xs font-semibold text-gray-600 mb-1">Fecha de pago</label>
           <input type="date" [(ngModel)]="formularioPago.fechaPago" name="fechaPago"
             class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
         </div>
 
-        <div>
+        <div class="mb-4">
           <label class="block text-xs font-semibold text-gray-600 mb-1">Observaciones (opcional)</label>
           <input type="text" [(ngModel)]="formularioPago.notas" name="notas" placeholder="Notas del pago..."
             class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
         </div>
 
-        <div class="rounded-xl bg-emerald-50 border border-emerald-100 px-4 py-3 flex items-center justify-between">
+        <div class="rounded-xl bg-emerald-50 border border-emerald-100 px-4 py-3 mb-6 flex items-center justify-between">
           <span class="text-xs font-semibold text-emerald-700">Total a cobrar:</span>
           <span class="text-lg font-bold text-emerald-700">Bs. {{ formularioPago.monto }}</span>
         </div>
 
-        <div class="flex items-center justify-end gap-3 pt-2">
+        <div class="flex items-center justify-end gap-3">
           <button type="button" (click)="cerrarModalPago()" class="px-5 py-2 text-xs font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors">
             Cancelar
           </button>

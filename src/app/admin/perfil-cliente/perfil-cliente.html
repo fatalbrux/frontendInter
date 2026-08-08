@@ -105,6 +105,10 @@
             <p class="text-sm text-gray-800 mt-1">{{ cliente()!.ci || '—' }}</p>
           </div>
           <div>
+            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Usuario</p>
+            <p class="text-sm text-gray-800 mt-1 font-mono">{{ cliente()!.usuario || '—' }}</p>
+          </div>
+          <div>
             <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Teléfono</p>
             <p class="text-sm text-gray-800 mt-1">{{ cliente()!.telefono || '—' }}</p>
           </div>
@@ -199,48 +203,72 @@
 
       <!-- TAB: Historial de Pagos -->
       @if (tabActiva() === 'pagos') {
-        <div class="p-6">
-          @if (pagos().length === 0) {
-            <p class="text-center text-gray-400 py-8">Este cliente aún no tiene pagos registrados.</p>
-          } @else {
-            <table class="w-full text-left text-xs">
-              <thead>
-                <tr class="text-gray-500 font-bold border-b border-gray-100">
-                  <th class="py-2.5 pr-4">Recibo</th>
-                  <th class="py-2.5 pr-4">Fecha</th>
-                  <th class="py-2.5 pr-4">Meses</th>
-                  <th class="py-2.5 pr-4">Monto</th>
-                  <th class="py-2.5 pr-4">Método</th>
-                  <th class="py-2.5 pr-4">Venc. anterior</th>
-                  <th class="py-2.5 pr-4">Nuevo venc.</th>
-                  <th class="py-2.5">Notas</th>
+  <div class="p-6">
+    @if (pagos().length === 0) {
+      <p class="text-center text-gray-400 py-8">Este cliente aún no tiene pagos registrados.</p>
+    } @else {
+      <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="text-gray-600 font-bold border-b border-gray-100 bg-gray-50/50">
+                <th class="py-3.5 px-4">Recibo</th>
+                <th class="py-3.5 px-4">Fecha</th>
+                <th class="py-3.5 px-4">Meses</th>
+                <th class="py-3.5 px-4">Monto</th>
+                <th class="py-3.5 px-4">Método</th>
+                <th class="py-3.5 px-4">Venc. anterior</th>
+                <th class="py-3.5 px-4">Nuevo venc.</th>
+                <th class="py-3.5 px-4">Notas</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100 text-gray-700">
+              @for (p of pagos(); track p.id) {
+                <tr class="hover:bg-gray-50/80 transition-colors">
+                  <td class="py-3 px-4 font-bold text-red-600 whitespace-nowrap">{{ p.nroRecibo }}</td>
+                  <td class="py-3 px-4 font-medium text-gray-600">{{ p.fechaPago | date:'dd/MM/yyyy' }}</td>
+                  <td class="py-3 px-4">
+                    <span class="bg-red-50 text-red-600 text-[11px] font-semibold px-2 py-0.5 rounded-full">{{ p.mesesPagados }}</span>
+                  </td>
+                  <td class="py-3 px-4 font-bold text-emerald-600">Bs. {{ p.monto }}</td>
+                  <td class="py-3 px-4">
+                    <div class="flex flex-col items-start gap-1">
+                      <span [ngClass]="p.metodoPago === 'Efectivo' ? 'bg-emerald-50 text-emerald-600' : 'bg-indigo-50 text-indigo-600'"
+                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold">
+                        <span [ngClass]="p.metodoPago === 'Efectivo' ? 'bg-emerald-500' : 'bg-indigo-500'" class="w-1.5 h-1.5 rounded-full"></span>
+                        {{ p.metodoPago }}
+                      </span>
+                      @if (p.metodoPago === 'Código QR' && p.banco) {
+                        <span [ngClass]="{
+                          'bg-blue-50 text-blue-700': p.banco === 'Banco Unión',
+                          'bg-teal-50 text-teal-700': p.banco === 'Banco Prodem',
+                          'bg-emerald-50 text-emerald-700': p.banco === 'Banco BNB',
+                          'bg-amber-50 text-amber-700': p.banco === 'Tigo Money'
+                        }" class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold">
+                          {{ p.banco }}
+                        </span>
+                      }
+                    </div>
+                  </td>
+                  <td class="py-3 px-4 text-gray-400">{{ p.vencimientoAnterior | date:'dd/MM/yyyy' }}</td>
+                  <td class="py-3 px-4 font-bold text-gray-800">{{ p.nuevoVencimiento | date:'dd/MM/yyyy' }}</td>
+                  <td class="py-3 px-4 text-gray-400 italic">{{ p.notas || '—' }}</td>
                 </tr>
-              </thead>
-              <tbody class="divide-y divide-gray-50">
-                @for (p of pagos(); track p.id) {
-                  <tr>
-                    <td class="py-2.5 pr-4 font-bold text-red-600">{{ p.nroRecibo }}</td>
-                    <td class="py-2.5 pr-4 text-gray-600">{{ p.fechaPago }}</td>
-                    <td class="py-2.5 pr-4 text-gray-600">{{ p.mesesPagados }}</td>
-                    <td class="py-2.5 pr-4 font-bold text-emerald-600">Bs. {{ p.monto }}</td>
-                    <td class="py-2.5 pr-4 text-gray-600">{{ p.metodoPago || '—' }}</td>
-                    <td class="py-2.5 pr-4 text-gray-400">{{ p.vencimientoAnterior || '—' }}</td>
-                    <td class="py-2.5 pr-4 font-semibold text-gray-700">{{ p.nuevoVencimiento || '—' }}</td>
-                    <td class="py-2.5 text-gray-400">{{ p.notas || '—' }}</td>
-                  </tr>
-                }
-              </tbody>
-              <tfoot>
-                <tr class="border-t border-gray-100">
-                  <td colspan="3" class="py-3 font-bold text-gray-700">Total histórico</td>
-                  <td class="py-3 font-bold text-red-700">Bs. {{ totalPagado() }}</td>
-                  <td colspan="4"></td>
-                </tr>
-              </tfoot>
-            </table>
-          }
+              }
+            </tbody>
+            <tfoot>
+              <tr class="border-t border-gray-100 bg-gray-50/50">
+                <td colspan="3" class="py-3 px-4 font-bold text-gray-700">Total histórico</td>
+                <td class="py-3 px-4 font-bold text-red-700">Bs. {{ totalPagado() }}</td>
+                <td colspan="4"></td>
+              </tr>
+            </tfoot>
+          </table>
         </div>
-      }
+      </div>
+    }
+  </div>
+}
     </div>
   </div>
 }

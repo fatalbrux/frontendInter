@@ -86,9 +86,11 @@ puedeRegistrarPago(cliente: Cliente | null): boolean {
   notas = signal<string>('');
 
   precioMensualSeleccionado = computed(() => {
-    const cliente = this.clienteSeleccionado();
-    return cliente?.plan?.precioMensual ?? 0;
-  });
+  const cliente = this.clienteSeleccionado();
+  if (!cliente) return 0;
+  const plan = this.listaPlanes().find(p => p.id === cliente.plan?.id);
+  return Number(plan?.precioMensual ?? 0); // agrega Number() si no lo tenías
+});
 
   mesesPendientes = computed(() => {
     const cliente = this.clienteSeleccionado();
@@ -142,6 +144,10 @@ puedeRegistrarPago(cliente: Cliente | null): boolean {
   nombreClientePago(pago: Pago): string {
   return pago.cliente ? `${pago.cliente.nombres} ${pago.cliente.apellidos}` : '—';
 }
+
+  nombreUsuarioPago(pago: Pago): string {
+  return pago.cliente?.usuario ?? '—';
+  }
 
   totalIngresosMes(): number {
     const hoy = new Date();

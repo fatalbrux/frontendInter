@@ -247,4 +247,16 @@ export class Instalaciones implements OnInit {
     const d = String(fecha.getDate()).padStart(2, '0');
     return `${y}-${m}-${d}`;
   }
+
+  busquedaInstalacion = signal<string>('');
+
+instalacionesFiltradas = computed(() => {
+  const texto = this.busquedaInstalacion().trim().toLowerCase();
+  if (!texto) return this.listaInstalaciones();
+  return this.listaInstalaciones().filter((i) =>
+    `${i.cliente?.nombres} ${i.cliente?.apellidos}`.toLowerCase().includes(texto) ||
+    i.equipo?.codigo?.toLowerCase().includes(texto) ||
+    i.direccion?.toLowerCase().includes(texto)
+  );
+});
 }

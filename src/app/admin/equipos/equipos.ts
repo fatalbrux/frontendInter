@@ -9,7 +9,7 @@ import { Marca } from '../../core/interfaces/marca';
 import { TipoEquipo } from '../../core/interfaces/tipo-equipo';
 import { ClientesService } from '../../core/services/clientes';
 import { Cliente } from '../../core/interfaces/cliente';
-
+import { NotificacionesService } from '../../core/services/notificaciones';
 @Component({
   selector: 'app-equipos',
   standalone: true,
@@ -17,6 +17,7 @@ import { Cliente } from '../../core/interfaces/cliente';
   templateUrl: './equipos.html'
 })
 export class Equipos implements OnInit {
+  private readonly notificaciones = inject(NotificacionesService);
   private readonly equiposService = inject(EquiposService);
   private readonly marcasService = inject(MarcasService);
   private readonly tiposEquipoService = inject(TiposEquipoService);
@@ -167,12 +168,16 @@ quitarClienteEquipo(): void {
   guardar(): void {
     if (this.modoEdicion() && this.idSeleccionado() !== null) {
       this.equiposService.funEditar(this.formulario, this.idSeleccionado()!).subscribe({
-        next: () => this.reiniciarYRefrescar(),
+        next: () => {
+          this.notificaciones.exito('Equipo actualizado exitosamente');
+          this.reiniciarYRefrescar()},
         error: (err) => console.error(err)
       });
     } else {
       this.equiposService.funGuardar(this.formulario).subscribe({
-        next: () => this.reiniciarYRefrescar(),
+        next: () => {
+          this.notificaciones.exito('Equipo guardado exitosamente');
+          this.reiniciarYRefrescar()},
         error: (err) => console.error(err)
       });
     }
@@ -189,6 +194,7 @@ quitarClienteEquipo(): void {
         next: () => {
           this.mostrarConfirmarEliminar.set(false);
           this.idEquipoAEliminar = null;
+          this.notificaciones.exito('Equipo eliminado exitosamente');
           this.listarEquipos();
         },
         error: (err) => console.error(err)
@@ -250,12 +256,18 @@ quitarClienteEquipo(): void {
   guardarMarca(): void {
     if (this.modoEdicionMarca() && this.idMarcaSeleccionada() !== null) {
       this.marcasService.funEditar(this.formularioMarca, this.idMarcaSeleccionada()!).subscribe({
-        next: () => this.reiniciarYRefrescarMarca(),
+        next: () => {
+          this.notificaciones.exito('Marca actualizada exitosamente');
+          this.reiniciarYRefrescarMarca()
+        },
         error: (err) => console.error(err)
       });
     } else {
       this.marcasService.funGuardar(this.formularioMarca).subscribe({
-        next: () => this.reiniciarYRefrescarMarca(),
+        next: () => {
+          this.notificaciones.exito('Marca guardada exitosamente');
+          this.reiniciarYRefrescarMarca()
+        },
         error: (err) => console.error(err)
       });
     }
@@ -270,6 +282,7 @@ quitarClienteEquipo(): void {
     if (this.idMarcaAEliminar !== null) {
       this.marcasService.funEliminar(this.idMarcaAEliminar).subscribe({
         next: () => {
+          this.notificaciones.exito('Marca eliminada exitosamente');
           this.mostrarConfirmarEliminarMarca.set(false);
           this.idMarcaAEliminar = null;
           this.listarMarcas();
@@ -320,12 +333,18 @@ quitarClienteEquipo(): void {
   guardarTipoEquipo(): void {
     if (this.modoEdicionTipoEquipo() && this.idTipoEquipoSeleccionado() !== null) {
       this.tiposEquipoService.funEditar(this.formularioTipoEquipo, this.idTipoEquipoSeleccionado()!).subscribe({
-        next: () => this.reiniciarYRefrescarTipoEquipo(),
+        next: () => {
+          this.notificaciones.exito('Tipo de equipo actualizado exitosamente');
+          this.reiniciarYRefrescarTipoEquipo()
+        },
         error: (err) => console.error(err)
       });
     } else {
       this.tiposEquipoService.funGuardar(this.formularioTipoEquipo).subscribe({
-        next: () => this.reiniciarYRefrescarTipoEquipo(),
+        next: () => {
+          this.notificaciones.exito('Tipo de equipo guardado exitosamente');
+          this.reiniciarYRefrescarTipoEquipo()
+        },
         error: (err) => console.error(err)
       });
     }
@@ -340,6 +359,7 @@ quitarClienteEquipo(): void {
     if (this.idTipoEquipoAEliminar !== null) {
       this.tiposEquipoService.funEliminar(this.idTipoEquipoAEliminar).subscribe({
         next: () => {
+          this.notificaciones.exito('Tipo de equipo eliminado exitosamente');
           this.mostrarConfirmarEliminarTipoEquipo.set(false);
           this.idTipoEquipoAEliminar = null;
           this.listarTiposEquipo();
@@ -360,4 +380,22 @@ quitarClienteEquipo(): void {
     this.idTipoEquipoSeleccionado.set(null);
     this.listarTiposEquipo();
   }
+
+
+  busquedaEquipo = signal<string>('');
+
+equiposFiltrados = computed(() => {
+  const texto = this.busquedaEquipo().trim().toLowerCase();
+  if (!texto) return this.listaEquipos();
+
+  return this.listaEquipos().filter((e) =>
+    e.codigo?.toLowerCase().includes(texto) ||
+    e.marca?.nombre?.toLowerCase().includes(texto) ||
+    e.modelo?.toLowerCase().includes(texto) ||
+    e.nroSerie?.toLowerCase().includes(texto) ||
+    e.mac?.toLowerCase().includes(texto) ||
+    e.ip?.toLowerCase().includes(texto)
+  );
+});
+
 }

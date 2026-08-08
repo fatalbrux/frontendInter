@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PlanesService } from '../../core/services/planes';
 import { Plan } from '../../core/interfaces/plan';
+import { NotificacionesService } from '../../core/services/notificaciones';
 
 @Component({
   selector: 'app-planes',
@@ -12,7 +13,7 @@ import { Plan } from '../../core/interfaces/plan';
 })
 export class Planes implements OnInit {
   private readonly planesService = inject(PlanesService);
-
+  private readonly notificaciones = inject(NotificacionesService);
   listaPlanes = signal<Plan[]>([]);
   mostrarModal = signal<boolean>(false);
   mostrarConfirmarEliminar = signal<boolean>(false);
@@ -72,12 +73,20 @@ export class Planes implements OnInit {
   guardar(): void {
     if (this.modoEdicion() && this.idSeleccionado() !== null) {
       this.planesService.funEditar(this.formulario, this.idSeleccionado()!).subscribe({
-        next: () => this.reiniciarYRefrescar(),
+        next: () =>
+          { 
+            this.notificaciones.exito('Plan actualizado exitosamente');
+            this.reiniciarYRefrescar()
+        },
         error: (err) => console.error(err)
       });
     } else {
       this.planesService.funGuardar(this.formulario).subscribe({
-        next: () => this.reiniciarYRefrescar(),
+        next: () =>
+          { 
+            this.notificaciones.exito('Plan registrado exitosamente');
+            this.reiniciarYRefrescar()
+        },
         error: (err) => console.error(err)
       });
     }
@@ -102,6 +111,7 @@ export class Planes implements OnInit {
         next: () => {
           this.mostrarConfirmarEliminar.set(false);
           this.idPlanAEliminar = null;
+          this.notificaciones.exito('Plan eliminado exitosamente'); // 👈 nueva línea
           this.listar();
         },
         error: (err) => console.error(err)
