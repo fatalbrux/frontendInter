@@ -12,6 +12,10 @@ export class EquiposService {
     return this.http.get<Equipo[]>(this.urlBase);
   }
 
+  funSiguienteCodigo(): Observable<{ codigo: string }> {
+  return this.http.get<{ codigo: string }>(`${this.urlBase}/siguiente-codigo`);
+}
+
   funGuardar(dato: Partial<Equipo>) {
     return this.http.post(this.urlBase, dato);
   }

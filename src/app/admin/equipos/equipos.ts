@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EquiposService } from '../../core/services/equipos';
@@ -22,6 +22,7 @@ export class Equipos implements OnInit {
   private readonly marcasService = inject(MarcasService);
   private readonly tiposEquipoService = inject(TiposEquipoService);
 
+  private readonly cdr = inject(ChangeDetectorRef); // nuevo
   private readonly clientesService = inject(ClientesService);
   listaClientes = signal<Cliente[]>([]);
   // ================= EQUIPOS =================
@@ -105,12 +106,33 @@ seleccionarClienteEquipo(cliente: Cliente): void {
   this.clienteSeleccionadoEquipo.set(cliente);
   this.formulario.clienteId = cliente.id;
   this.busquedaClienteEquipo.set('');
+
+  // Autocompleta el usuario PPPoE solo si el campo está vacío,
+  // para no pisar un valor que el técnico ya haya escrito a mano.
+  if (!this.formulario.pppoeUsuario && cliente.usuario) {
+    this.formulario.pppoeUsuario = cliente.usuario;
+  }
+  // Al asignar un cliente, el equipo pasa a estar instalado
+  this.formulario.estado = 'Instalado';
 }
 
 quitarClienteEquipo(): void {
+
+  const clienteAnterior = this.clienteSeleccionadoEquipo();
+
+  // Si el pppoeUsuario actual coincide con el del cliente que se está quitando,
+  // lo limpia también (para no dejar un dato huérfano)
+  if (clienteAnterior && this.formulario.pppoeUsuario === clienteAnterior.usuario) {
+    this.formulario.pppoeUsuario = '';
+  }
   this.clienteSeleccionadoEquipo.set(null);
   this.formulario.clienteId = undefined;
   this.busquedaClienteEquipo.set('');
+
+   // Al quitar el cliente, vuelve a Disponible (si no estaba en Mantenimiento/Dañado/Retirado)
+  if (this.formulario.estado === 'Instalado') {
+    this.formulario.estado = 'Disponible';
+  }
 }
 
   // ================= EQUIPOS =================
@@ -127,7 +149,7 @@ quitarClienteEquipo(): void {
   this.clienteSeleccionadoEquipo.set(null);   // nuevo
   this.busquedaClienteEquipo.set('');          // nuevo
     this.formulario = {
-      codigo: '',
+      codigo: '', // nuevo
       modelo: '',
       nroSerie: '',
       mac: '',
@@ -140,7 +162,19 @@ quitarClienteEquipo(): void {
       clienteId: undefined
     };
     this.mostrarModal.set(true);
+
+    this.equiposService.funSiguienteCodigo().subscribe({
+    next: (res) => { 
+      this.formulario.codigo = res.codigo; 
+      this.cdr.detectChanges();
+    },
+    error: (err) => console.error(err),
+  });
   }
+
+  private generarCodigoEquipo(): string {
+  return `EQ-${Math.floor(100 + Math.random() * 900)}`;
+}
 
   seleccionarParaEditar(equipo: Equipo): void {
     this.modoEdicion.set(true);

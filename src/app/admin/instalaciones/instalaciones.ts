@@ -180,6 +180,12 @@ seleccionarParaEditar(instalacion: Instalacion): void {
     if (!this.direccion() && cliente.direccion) {
       this.direccion.set(cliente.direccion);
     }
+    // Solo sugiere la fecha si el cliente aún no tiene una registrada
+  // (primera instalación). Si ya tiene, se deja libre para instalaciones
+  // adicionales (ej. TV cable después de internet).
+  if (cliente.fechaInstalacion && !this.modoEdicion()) {
+    this.fechaInstalacion = this.formatearInputDate(new Date(cliente.fechaInstalacion));
+  }
   }
 
   quitarClienteSeleccionado(): void {

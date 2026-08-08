@@ -14,6 +14,7 @@ export interface ClienteResumen {
   nombres: string;
   apellidos: string;
   ci?: string;
+  usuario?: string | null; // agrega | null
 }
 
 export interface Equipo {
