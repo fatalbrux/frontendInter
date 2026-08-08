@@ -2,10 +2,11 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Marca } from '../interfaces/marca';
+import { environment } from '../../../environments/environment.development';
 
 @Injectable({ providedIn: 'root' })
 export class MarcasService {
-  private readonly urlBase = 'http://localhost:3000/marca';
+  private readonly urlBase = `${environment.apiUrl}/marca`;
   private readonly http = inject(HttpClient);
 
   funListar(): Observable<Marca[]> {

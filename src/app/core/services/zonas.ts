@@ -2,10 +2,11 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Zona } from '../interfaces/zona';
+import { environment } from '../../../environments/environment.development';
 
 @Injectable({ providedIn: 'root' })
 export class ZonasService {
-  private readonly urlBase = 'http://localhost:3000/zona';
+  private readonly urlBase = `${environment.apiUrl}/zona`;
   private readonly http = inject(HttpClient);
 
   funListar(): Observable<Zona[]> {

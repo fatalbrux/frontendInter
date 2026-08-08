@@ -2,10 +2,11 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Pago, PagoPayload } from '../interfaces/pago';
+import { environment } from '../../../environments/environment.development';
 
 @Injectable({ providedIn: 'root' })
 export class PagosService {
-  private readonly urlBase = 'http://localhost:3000/pago';
+  private readonly urlBase = `${environment.apiUrl}/pago`;
   private readonly http = inject(HttpClient);
 
   funListar(): Observable<Pago[]> {
