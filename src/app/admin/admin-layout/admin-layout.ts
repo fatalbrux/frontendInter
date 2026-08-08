@@ -7,7 +7,7 @@ import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { filter, map } from 'rxjs/operators';
 import { OnInit } from '@angular/core';
 import { DashboardService } from '../../core/services/dashboard';
-
+import { AuthService } from '../../core/services/auth';
 
 interface MenuItem {
   label: string;
@@ -50,12 +50,24 @@ export class AdminLayout implements OnInit{
   private readonly router = inject(Router);
   private readonly activatedRoute = inject(ActivatedRoute);
 
-  // TODO: reemplazar con datos reales (AuthService / NotificacionesService)
-  usuario = {
-    nombre: 'Administrador',
-    email: 'admin@isp.com',
-    iniciales: 'A',
+private readonly authService = inject(AuthService);
+
+usuario = computed(() => {
+  const u = this.authService.getUsuario();
+  const nombre = u?.nombreCompleto || 'Usuario';
+  const iniciales = nombre
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((p) => p[0].toUpperCase())
+    .join('');
+
+  return {
+    nombre,
+    email: u?.email || '',
+    iniciales: iniciales || 'U',
   };
+});
   notificationCount = 7;
   pageTitle = signal<string>('');
   //pageTitle = 'Clientes'; // TODO: setear desde route.data o un breadcrumb service
@@ -117,4 +129,9 @@ menuItems = computed<MenuItem[]>(() =>
   private trust(html: string): SafeHtml {
     return this.sanitizer.bypassSecurityTrustHtml(html);
   }
+
+  cerrarSesion(): void {
+  this.authService.logout();
+  this.router.navigate(['/login']);
+}
 }
