@@ -10,12 +10,16 @@ import { PerfilCliente } from './admin/perfil-cliente/perfil-cliente';
 import { Dashboard } from './admin/dashboard/dashboard';
 import { Reportes } from './admin/reportes/reportes';
 import { Morosos } from './admin/morosos/morosos';
+import { Login } from './auth/login/login';
+import { authGuard } from './core/guards/auth-guard';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'admin', pathMatch: 'full' },
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: 'login', component: Login },
   {
     path: 'admin',
     component: AdminLayout,
+    canActivate: [authGuard],
     children: [
       { path: '', redirectTo: 'clientes', pathMatch: 'full' },
       { path: 'clientes', component: Clientes, data: { title: 'Clientes' } },
@@ -30,5 +34,5 @@ export const routes: Routes = [
       { path: 'morosos', component: Morosos, data: { title: 'Morosos' } },
     ]
   },
-  { path: '**', redirectTo: 'admin' }
+  { path: '**', redirectTo: 'login' }
 ];
