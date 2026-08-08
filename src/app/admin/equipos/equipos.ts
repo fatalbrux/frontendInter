@@ -94,6 +94,8 @@ clientesEncontradosEquipo = computed(() => {
   return this.listaClientes()
     .filter(c =>
       c.ci?.toLowerCase().includes(texto) ||
+      c.codigo?.toLowerCase().includes(texto) ||
+      c.usuario?.toLowerCase().includes(texto) ||
       `${c.nombres} ${c.apellidos}`.toLowerCase().includes(texto)
     )
     .slice(0, 8);
@@ -154,9 +156,9 @@ quitarClienteEquipo(): void {
       pppoeUsuario: equipo.pppoeUsuario,
       pppoePassword: equipo.pppoePassword,
       estado: equipo.estado,
-      tipoEquipoId: equipo.tipoEquipoId,
-      marcaId: equipo.marcaId,
-      clienteId: equipo.clienteId ?? undefined, // nuevo
+    tipoEquipoId: equipo.tipoEquipo?.id,   // 👈 antes: equipo.tipoEquipoId
+    marcaId: equipo.marca?.id,             // 👈 antes: equipo.marcaId
+    clienteId: equipo.cliente?.id,         // 👈 más seguro que equipo.clienteId
     };
     this.mostrarModal.set(true);
   }
