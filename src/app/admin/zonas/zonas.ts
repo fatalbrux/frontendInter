@@ -136,7 +136,7 @@ export class Zonas implements OnInit {
     this.formularioZona = {
       nombre: zona.nombre,
       estado: zona.estado,
-      ciudadId: zona.ciudadId
+    ciudadId: zona.ciudad?.id, // cambia aquí
     };
     this.mostrarModalZona.set(true);
   }
@@ -198,7 +198,7 @@ export class Zonas implements OnInit {
   }
 
   // helper para el html
-  nombreCiudad(ciudadId: number): string {
-    return this.listaCiudades().find(c => c.id === ciudadId)?.nombre ?? '—';
-  }
+  nombreCiudad(ciudadId: number | undefined): string {
+  return this.listaCiudades().find(c => c.id === ciudadId)?.nombre ?? '—';
+}
 }

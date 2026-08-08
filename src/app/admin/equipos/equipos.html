@@ -1,52 +1,76 @@
 <div class="p-6">
-  <p class="text-xs text-gray-400">ISP Manager</p>
   <h1 class="text-2xl font-bold text-gray-800 mb-6">Equipos</h1>
 
   <!-- ====== MARCAS Y TIPOS DE EQUIPO (catálogos, se registran primero) ====== -->
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+
     <!-- MARCAS -->
-    <div class="bg-white rounded-xl shadow p-5 border-l-4 border-red-600">
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
       <div class="flex justify-between items-center mb-4">
         <div>
-          <h2 class="text-lg font-semibold text-gray-800">Marcas</h2>
+          <h2 class="text-base font-bold text-gray-800">Marcas</h2>
           <p class="text-xs text-gray-400">{{ listaMarcas().length }} registradas</p>
         </div>
         <button (click)="abrirModalCrearMarca()"
-          class="bg-red-600 hover:bg-red-700 text-white text-sm font-medium px-3 py-1.5 rounded-lg">
-          + Marca
+          class="flex items-center gap-1.5 bg-red-700 hover:bg-red-800 text-white text-xs font-semibold px-3 py-2 rounded-xl shadow-sm transition-colors">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+          </svg>
+          Marca
         </button>
       </div>
+
       <div class="flex flex-wrap gap-2">
         <div *ngFor="let marca of listaMarcas()"
-          class="flex items-center gap-2 border rounded-lg px-3 py-1.5 bg-gray-50 text-sm">
-          <span class="text-gray-700">{{ marca.nombre }}</span>
-          <button (click)="seleccionarMarcaParaEditar(marca)" class="text-xs text-amber-600 hover:underline">Editar</button>
-          <button (click)="eliminarMarca(marca.id)" class="text-xs text-red-600 hover:underline">Eliminar</button>
+          class="flex items-center gap-2 rounded-full bg-gray-50 border border-gray-100 pl-3 pr-1.5 py-1.5 text-xs font-medium text-gray-700">
+          <span>{{ marca.nombre }}</span>
+          <div class="flex items-center gap-0.5">
+            <button (click)="seleccionarMarcaParaEditar(marca)" title="Editar"
+              class="p-1 rounded-full bg-amber-50 text-amber-500 hover:bg-amber-100 transition-colors">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+            </button>
+            <button (click)="eliminarMarca(marca.id)" title="Eliminar"
+              class="p-1 rounded-full bg-red-50 text-red-400 hover:bg-red-100 transition-colors">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            </button>
+          </div>
         </div>
-        <p *ngIf="listaMarcas().length === 0" class="text-sm text-gray-400">No hay marcas registradas.</p>
+        <p *ngIf="listaMarcas().length === 0" class="text-xs text-gray-400">No hay marcas registradas.</p>
       </div>
     </div>
 
     <!-- TIPOS DE EQUIPO -->
-    <div class="bg-white rounded-xl shadow p-5 border-l-4 border-red-600">
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
       <div class="flex justify-between items-center mb-4">
         <div>
-          <h2 class="text-lg font-semibold text-gray-800">Tipos de Equipo</h2>
+          <h2 class="text-base font-bold text-gray-800">Tipos de Equipo</h2>
           <p class="text-xs text-gray-400">{{ listaTiposEquipo().length }} registrados</p>
         </div>
         <button (click)="abrirModalCrearTipoEquipo()"
-          class="bg-red-600 hover:bg-red-700 text-white text-sm font-medium px-3 py-1.5 rounded-lg">
-          + Tipo
+          class="flex items-center gap-1.5 bg-red-700 hover:bg-red-800 text-white text-xs font-semibold px-3 py-2 rounded-xl shadow-sm transition-colors">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+          </svg>
+          Tipo
         </button>
       </div>
+
       <div class="flex flex-wrap gap-2">
         <div *ngFor="let tipo of listaTiposEquipo()"
-          class="flex items-center gap-2 border rounded-lg px-3 py-1.5 bg-gray-50 text-sm">
-          <span class="text-gray-700">{{ tipo.nombre }}</span>
-          <button (click)="seleccionarTipoEquipoParaEditar(tipo)" class="text-xs text-amber-600 hover:underline">Editar</button>
-          <button (click)="eliminarTipoEquipo(tipo.id)" class="text-xs text-red-600 hover:underline">Eliminar</button>
+          class="flex items-center gap-2 rounded-full bg-gray-50 border border-gray-100 pl-3 pr-1.5 py-1.5 text-xs font-medium text-gray-700">
+          <span>{{ tipo.nombre }}</span>
+          <div class="flex items-center gap-0.5">
+            <button (click)="seleccionarTipoEquipoParaEditar(tipo)" title="Editar"
+              class="p-1 rounded-full bg-amber-50 text-amber-500 hover:bg-amber-100 transition-colors">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+            </button>
+            <button (click)="eliminarTipoEquipo(tipo.id)" title="Eliminar"
+              class="p-1 rounded-full bg-red-50 text-red-400 hover:bg-red-100 transition-colors">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            </button>
+          </div>
         </div>
-        <p *ngIf="listaTiposEquipo().length === 0" class="text-sm text-gray-400">No hay tipos registrados.</p>
+        <p *ngIf="listaTiposEquipo().length === 0" class="text-xs text-gray-400">No hay tipos registrados.</p>
       </div>
     </div>
   </div>
@@ -54,199 +78,236 @@
   <!-- ====== EQUIPOS ====== -->
   <div class="flex justify-between items-center mb-4">
     <div>
-      <h2 class="text-lg font-semibold text-gray-800">Gestión de Equipos</h2>
-      <p class="text-xs text-gray-400">{{ listaEquipos().length }} equipos registrados</p>
+      <h2 class="text-lg font-bold text-gray-800">Gestión de Equipos</h2>
+      <p class="text-sm text-gray-500 font-medium mt-0.5">{{ listaEquipos().length }} equipos registrados</p>
     </div>
     <button (click)="abrirModalCrear()"
-      class="bg-red-600 hover:bg-red-700 text-white text-sm font-medium px-4 py-2 rounded-lg">
-      + Registrar Equipo
+      class="flex items-center gap-2 bg-red-700 hover:bg-red-800 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-md transition-colors">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+      </svg>
+      Registrar Equipo
     </button>
   </div>
 
-  <!-- resumen por estado, como en el PDF -->
-  <div class="flex flex-wrap gap-3 mb-4">
-    <span class="px-3 py-1.5 rounded-full text-sm bg-blue-50 text-blue-700">{{ contarPorEstado('Instalado') }} Instalado</span>
-    <span class="px-3 py-1.5 rounded-full text-sm bg-green-50 text-green-700">{{ contarPorEstado('Disponible') }} Disponible</span>
-    <span class="px-3 py-1.5 rounded-full text-sm bg-sky-50 text-sky-700">{{ contarPorEstado('En mantenimiento') }} En mantenimiento</span>
-    <span class="px-3 py-1.5 rounded-full text-sm bg-red-50 text-red-700">{{ contarPorEstado('Dañado') }} Dañado</span>
-    <span class="px-3 py-1.5 rounded-full text-sm bg-gray-100 text-gray-500">{{ contarPorEstado('Retirado') }} Retirado</span>
+  <!-- resumen por estado -->
+  <div class="flex flex-wrap gap-2 mb-4">
+    <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-600">
+      <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>{{ contarPorEstado('Instalado') }} Instalado
+    </span>
+    <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-600">
+      <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>{{ contarPorEstado('Disponible') }} Disponible
+    </span>
+    <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-sky-50 text-sky-600">
+      <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>{{ contarPorEstado('En mantenimiento') }} En mantenimiento
+    </span>
+    <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-600">
+      <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>{{ contarPorEstado('Dañado') }} Dañado
+    </span>
+    <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-500">
+      <span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span>{{ contarPorEstado('Retirado') }} Retirado
+    </span>
   </div>
 
-  <div class="bg-white rounded-xl shadow overflow-x-auto">
-    <table class="w-full text-sm">
-      <thead>
-        <tr class="text-left text-gray-400 border-b">
-          <th class="py-3 px-4">Código</th>
-          <th class="py-3 px-4">Marca / Modelo</th>
-          <th class="py-3 px-4">N° Serie</th>
-          <th class="py-3 px-4">MAC</th>
-          <th class="py-3 px-4">IP</th>
-          <th class="py-3 px-4">PPPoE</th>
-          <th class="py-3 px-4">Tipo</th>
-          <th class="py-3 px-4">Estado</th>
-          <th class="py-3 px-4">Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let equipo of listaEquipos()" class="border-b last:border-0 hover:bg-gray-50">
-          <td class="py-3 px-4 text-red-600 font-medium">{{ equipo.codigo }}</td>
-          <td class="py-3 px-4">
-            
-<p class="text-gray-800">{{ equipo.marca?.nombre ?? '—' }}</p>
-            <p class="text-gray-400 text-xs">{{ equipo.modelo }}</p>
-          </td>
-          <td class="py-3 px-4 text-gray-600">{{ equipo.nroSerie }}</td>
-          <td class="py-3 px-4 text-gray-600">{{ equipo.mac }}</td>
-          <td class="py-3 px-4 text-gray-600">{{ equipo.ip || '—' }}</td>
-          <td class="py-3 px-4">
-            <p class="text-gray-800">{{ equipo.pppoeUsuario || '—' }}</p>
-            <p class="text-gray-400 text-xs">{{ equipo.pppoePassword || '—' }}</p>
-          </td>
-          <td class="py-3 px-4 text-gray-600">{{ equipo.tipoEquipo?.nombre ?? '—' }}</td>
-          <td class="py-3 px-4">
-            <span class="text-xs px-2 py-0.5 rounded-full"
-              [ngClass]="{
-                'bg-blue-100 text-blue-700': equipo.estado === 'Instalado',
-                'bg-green-100 text-green-700': equipo.estado === 'Disponible',
-                'bg-sky-100 text-sky-700': equipo.estado === 'En mantenimiento',
-                'bg-red-100 text-red-700': equipo.estado === 'Dañado',
+  <div class="relative mb-4">
+  <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-gray-400">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+    </svg>
+  </span>
+  <input type="text" [ngModel]="busquedaEquipo()" (ngModelChange)="busquedaEquipo.set($event)"
+    placeholder="Buscar por código, marca, modelo, serial, MAC, IP..."
+    class="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-700 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all">
+</div>
+
+
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-xs border-collapse">
+        <thead>
+          <tr class="text-gray-600 font-bold border-b border-gray-100 bg-gray-50/50">
+            <th class="py-3.5 px-4">Código</th>
+            <th class="py-3.5 px-4">Marca / Modelo</th>
+            <th class="py-3.5 px-4">N° Serie</th>
+            <th class="py-3.5 px-4">MAC</th>
+            <th class="py-3.5 px-4">IP</th>
+            <th class="py-3.5 px-4">PPPoE</th>
+            <th class="py-3.5 px-4">Tipo</th>
+            <th class="py-3.5 px-4">Estado</th>
+            <th class="py-3.5 px-4 text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100 text-gray-700">
+          <tr *ngFor="let equipo of equiposFiltrados()" class="hover:bg-gray-50/80 transition-colors">
+            <td class="py-3 px-4 font-bold text-red-600 whitespace-nowrap">{{ equipo.codigo }}</td>
+            <td class="py-3 px-4">
+              <p class="font-bold text-gray-900">{{ equipo.marca?.nombre ?? '—' }}</p>
+              <p class="text-[11px] text-gray-400">{{ equipo.modelo }}</p>
+            </td>
+            <td class="py-3 px-4 font-medium text-gray-600">{{ equipo.nroSerie }}</td>
+            <td class="py-3 px-4 font-medium text-gray-600">{{ equipo.mac }}</td>
+            <td class="py-3 px-4 font-medium text-gray-600">{{ equipo.ip || '—' }}</td>
+            <td class="py-3 px-4">
+              <p class="font-medium text-gray-700">{{ equipo.pppoeUsuario || '—' }}</p>
+              <p class="text-[11px] text-gray-400">{{ equipo.pppoePassword || '—' }}</p>
+            </td>
+            <td class="py-3 px-4 font-medium text-gray-600">{{ equipo.tipoEquipo?.nombre ?? '—' }}</td>
+            <td class="py-3 px-4">
+              <span [ngClass]="{
+                'bg-blue-50 text-blue-600': equipo.estado === 'Instalado',
+                'bg-emerald-50 text-emerald-600': equipo.estado === 'Disponible',
+                'bg-sky-50 text-sky-600': equipo.estado === 'En mantenimiento',
+                'bg-rose-50 text-rose-600': equipo.estado === 'Dañado',
                 'bg-gray-100 text-gray-500': equipo.estado === 'Retirado'
-              }">
-              {{ equipo.estado }}
-            </span>
-          </td>
-          <td class="py-3 px-4">
-            <div class="flex gap-2">
-              <button (click)="seleccionarParaEditar(equipo)" class="text-amber-600 hover:underline text-xs">Editar</button>
-              <button (click)="eliminar(equipo.id)" class="text-red-600 hover:underline text-xs">Eliminar</button>
-            </div>
-          </td>
-        </tr>
-        <tr *ngIf="listaEquipos().length === 0">
-          <td colspan="9" class="py-6 text-center text-gray-400">No hay equipos registrados.</td>
-        </tr>
-      </tbody>
-    </table>
+              }" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold">
+                <span [ngClass]="{
+                  'bg-blue-500': equipo.estado === 'Instalado',
+                  'bg-emerald-500': equipo.estado === 'Disponible',
+                  'bg-sky-500': equipo.estado === 'En mantenimiento',
+                  'bg-rose-500': equipo.estado === 'Dañado',
+                  'bg-gray-400': equipo.estado === 'Retirado'
+                }" class="w-1.5 h-1.5 rounded-full"></span> {{ equipo.estado }}
+              </span>
+            </td>
+            <td class="py-3 px-4">
+              <div class="flex items-center justify-center gap-1">
+                <button (click)="seleccionarParaEditar(equipo)" title="Editar" class="p-1.5 rounded-lg bg-amber-50 text-amber-500 hover:bg-amber-100 transition-colors">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                </button>
+                <button (click)="eliminar(equipo.id)" title="Eliminar" class="p-1.5 rounded-lg bg-red-50 text-red-400 hover:bg-red-100 transition-colors">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="listaEquipos().length === 0">
+            <td colspan="9" class="text-center py-6 text-gray-400 font-medium">No hay equipos registrados.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 
 <!-- ====== MODAL EQUIPO ====== -->
-<div *ngIf="mostrarModal()" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-  <div class="bg-white rounded-xl shadow-lg w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
-    <div class="flex justify-between items-center mb-4">
-      <h3 class="font-semibold text-gray-800">{{ modoEdicion() ? 'Editar Equipo' : 'Registrar Nuevo Equipo' }}</h3>
-      <button (click)="cerrarModal()" class="text-gray-400 hover:text-gray-600">✕</button>
+<div *ngIf="mostrarModal()" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 overflow-y-auto">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden my-8">
+
+    <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+      <h2 class="text-lg font-bold text-gray-800">{{ modoEdicion() ? 'Editar Equipo' : 'Registrar Nuevo Equipo' }}</h2>
+      <button (click)="cerrarModal()" class="text-gray-400 hover:text-gray-600 p-1 rounded-lg">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
     </div>
 
-    <div class="grid grid-cols-2 gap-4 mb-4">
-      <div>
-        <label class="block text-sm text-gray-600 mb-1">Código</label>
-        <input type="text" [(ngModel)]="formulario.codigo" placeholder="RT-009"
-          class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500" />
+    <div class="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1">Código</label>
+          <input type="text" [(ngModel)]="formulario.codigo" placeholder="RT-009"
+            class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1">Modelo</label>
+          <input type="text" [(ngModel)]="formulario.modelo" placeholder="RB941-2nD"
+            class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500" />
+        </div>
       </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1">Marca</label>
+          <select [(ngModel)]="formulario.marcaId"
+            class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
+            <option [ngValue]="undefined" disabled>— Seleccionar marca —</option>
+            <option *ngFor="let marca of listaMarcas()" [ngValue]="marca.id">{{ marca.nombre }}</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1">Tipo de equipo</label>
+          <select [(ngModel)]="formulario.tipoEquipoId"
+            class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
+            <option [ngValue]="undefined" disabled>— Seleccionar tipo —</option>
+            <option *ngFor="let tipo of listaTiposEquipo()" [ngValue]="tipo.id">{{ tipo.nombre }}</option>
+          </select>
+        </div>
+      </div>
+
       <div>
-        <label class="block text-sm text-gray-600 mb-1">Modelo</label>
-        <input type="text" [(ngModel)]="formulario.modelo" placeholder="RB941-2nD"
-          class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500" />
+        <label class="block text-xs font-semibold text-gray-600 mb-1">Cliente (opcional)</label>
+
+        <div *ngIf="clienteSeleccionadoEquipo() as cli"
+             class="flex items-center justify-between border border-gray-200 rounded-xl px-3 py-2 bg-gray-50 text-xs">
+          <span class="text-gray-800 font-medium">{{ cli.nombres }} {{ cli.apellidos }} — CI: {{ cli.ci }}</span>
+          <button (click)="quitarClienteEquipo()" class="text-red-600 hover:underline font-semibold">Quitar</button>
+        </div>
+
+        <div *ngIf="!clienteSeleccionadoEquipo()">
+          <input type="text" [(ngModel)]="busquedaClienteEquipo" name="busquedaClienteEquipo"
+            placeholder="Buscar por CI o nombre..."
+            class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500" />
+
+          <div *ngIf="clientesEncontradosEquipo().length > 0"
+               class="border border-gray-200 rounded-xl mt-1 max-h-40 overflow-y-auto bg-white shadow-sm">
+            <div *ngFor="let cliente of clientesEncontradosEquipo()"
+              (click)="seleccionarClienteEquipo(cliente)"
+              class="px-3 py-2 text-xs hover:bg-gray-50 cursor-pointer border-b last:border-0 border-gray-100">
+              <p class="text-gray-800 font-medium">{{ cliente.nombres }} {{ cliente.apellidos }}</p>
+              <p class="text-gray-400">CI: {{ cliente.ci }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1">Número de serie</label>
+          <input type="text" [(ngModel)]="formulario.nroSerie" placeholder="SN12345"
+            class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1">Dirección MAC</label>
+          <input type="text" [(ngModel)]="formulario.mac" placeholder="DC:2C:6E:A1:B2:C3"
+            class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500" />
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1">Dirección IP</label>
+          <input type="text" [(ngModel)]="formulario.ip" placeholder="192.168.1.100"
+            class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1">Estado</label>
+          <select [(ngModel)]="formulario.estado"
+            class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
+            <option value="Disponible">Disponible</option>
+            <option value="Instalado">Instalado</option>
+            <option value="En mantenimiento">En mantenimiento</option>
+            <option value="Dañado">Dañado</option>
+            <option value="Retirado">Retirado</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1">Usuario PPPoE</label>
+          <input type="text" [(ngModel)]="formulario.pppoeUsuario" placeholder="cliente009"
+            class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1">Contraseña PPPoE</label>
+          <input type="text" [(ngModel)]="formulario.pppoePassword" placeholder="Pass@2025"
+            class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500" />
+        </div>
       </div>
     </div>
 
-    <div class="grid grid-cols-2 gap-4 mb-4">
-      <div>
-        <label class="block text-sm text-gray-600 mb-1">Marca</label>
-        <select [(ngModel)]="formulario.marcaId"
-          class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500">
-          <option [ngValue]="undefined" disabled>— Seleccionar marca —</option>
-          <option *ngFor="let marca of listaMarcas()" [ngValue]="marca.id">{{ marca.nombre }}</option>
-        </select>
-      </div>
-      <div>
-        <label class="block text-sm text-gray-600 mb-1">Tipo de equipo</label>
-        <select [(ngModel)]="formulario.tipoEquipoId"
-          class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500">
-          <option [ngValue]="undefined" disabled>— Seleccionar tipo —</option>
-          <option *ngFor="let tipo of listaTiposEquipo()" [ngValue]="tipo.id">{{ tipo.nombre }}</option>
-        </select>
-      </div>
-
-      <div class="mb-4">
-  <label class="block text-sm text-gray-600 mb-1">Cliente (opcional)</label>
-
-  <!-- si ya hay cliente seleccionado, muestra el chip -->
-  <div *ngIf="clienteSeleccionadoEquipo() as cli"
-       class="flex items-center justify-between border rounded-lg px-3 py-2 bg-gray-50 text-sm">
-    <span class="text-gray-800">{{ cli.nombres }} {{ cli.apellidos }} — CI: {{ cli.ci }}</span>
-    <button (click)="quitarClienteEquipo()" class="text-xs text-red-600 hover:underline">Quitar</button>
-  </div>
-
-  <!-- si no hay cliente seleccionado, muestra el buscador -->
-  <div *ngIf="!clienteSeleccionadoEquipo()">
-    <input type="text" [(ngModel)]="busquedaClienteEquipo"
-      placeholder="Buscar por CI o nombre..."
-      name="busquedaClienteEquipo"
-      class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500" />
-
-    <div *ngIf="clientesEncontradosEquipo().length > 0"
-         class="border rounded-lg mt-1 max-h-40 overflow-y-auto bg-white shadow-sm">
-      <div *ngFor="let cliente of clientesEncontradosEquipo()"
-        (click)="seleccionarClienteEquipo(cliente)"
-        class="px-3 py-2 text-sm hover:bg-gray-50 cursor-pointer border-b last:border-0">
-        <p class="text-gray-800">{{ cliente.nombres }} {{ cliente.apellidos }}</p>
-        <p class="text-gray-400 text-xs">CI: {{ cliente.ci }}</p>
-      </div>
-    </div>
-  </div>
-</div>
-    </div>
-
-    <div class="grid grid-cols-2 gap-4 mb-4">
-      <div>
-        <label class="block text-sm text-gray-600 mb-1">Número de serie</label>
-        <input type="text" [(ngModel)]="formulario.nroSerie" placeholder="SN12345"
-          class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500" />
-      </div>
-      <div>
-        <label class="block text-sm text-gray-600 mb-1">Dirección MAC</label>
-        <input type="text" [(ngModel)]="formulario.mac" placeholder="DC:2C:6E:A1:B2:C3"
-          class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500" />
-      </div>
-    </div>
-
-    <div class="grid grid-cols-2 gap-4 mb-4">
-      <div>
-        <label class="block text-sm text-gray-600 mb-1">Dirección IP</label>
-        <input type="text" [(ngModel)]="formulario.ip" placeholder="192.168.1.100"
-          class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500" />
-      </div>
-      <div>
-        <label class="block text-sm text-gray-600 mb-1">Estado</label>
-        <select [(ngModel)]="formulario.estado"
-          class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500">
-          <option value="Disponible">Disponible</option>
-          <option value="Instalado">Instalado</option>
-          <option value="En mantenimiento">En mantenimiento</option>
-          <option value="Dañado">Dañado</option>
-          <option value="Retirado">Retirado</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="grid grid-cols-2 gap-4 mb-6">
-      <div>
-        <label class="block text-sm text-gray-600 mb-1">Usuario PPPoE</label>
-        <input type="text" [(ngModel)]="formulario.pppoeUsuario" placeholder="cliente009"
-          class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500" />
-      </div>
-      <div>
-        <label class="block text-sm text-gray-600 mb-1">Contraseña PPPoE</label>
-        <input type="text" [(ngModel)]="formulario.pppoePassword" placeholder="Pass@2025"
-          class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500" />
-      </div>
-    </div>
-
-    <div class="flex justify-end gap-3">
-      <button (click)="cerrarModal()" class="px-4 py-2 rounded-lg border text-sm text-gray-600">Cancelar</button>
-      <button (click)="guardar()" class="px-4 py-2 rounded-lg bg-red-600 text-white text-sm">
+    <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100">
+      <button (click)="cerrarModal()" class="px-5 py-2 text-xs font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors">Cancelar</button>
+      <button (click)="guardar()" class="px-5 py-2 text-xs font-semibold text-white bg-red-700 hover:bg-red-800 rounded-xl shadow-sm transition-colors">
         {{ modoEdicion() ? 'Guardar cambios' : 'Registrar equipo' }}
       </button>
     </div>
@@ -254,73 +315,103 @@
 </div>
 
 <!-- ====== CONFIRMAR ELIMINAR EQUIPO ====== -->
-<div *ngIf="mostrarConfirmarEliminar()" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-  <div class="bg-white rounded-xl shadow-lg w-full max-w-sm p-6 text-center">
-    <p class="text-gray-700 mb-6">¿Seguro que deseas eliminar este equipo?</p>
-    <div class="flex justify-center gap-3">
-      <button (click)="cancelarEliminar()" class="px-4 py-2 rounded-lg border text-sm text-gray-600">Cancelar</button>
-      <button (click)="confirmarEliminarReal()" class="px-4 py-2 rounded-lg bg-red-600 text-white text-sm">Eliminar</button>
+<div *ngIf="mostrarConfirmarEliminar()" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
+    <div class="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mx-auto mb-4">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+      </svg>
+    </div>
+    <h3 class="text-base font-bold text-gray-800 mb-2">¿Confirmar eliminación?</h3>
+    <p class="text-xs text-gray-500 mb-6">Esta acción eliminará el equipo de manera permanente y no se podrá deshacer.</p>
+    <div class="flex items-center justify-center gap-3">
+      <button (click)="cancelarEliminar()" class="w-full py-2.5 text-xs font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors">Cancelar</button>
+      <button (click)="confirmarEliminarReal()" class="w-full py-2.5 text-xs font-semibold text-white bg-red-600 hover:bg-red-700 rounded-xl transition-colors">Sí, eliminar</button>
     </div>
   </div>
 </div>
 
 <!-- ====== MODAL MARCA ====== -->
-<div *ngIf="mostrarModalMarca()" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-  <div class="bg-white rounded-xl shadow-lg w-full max-w-sm p-6">
-    <div class="flex justify-between items-center mb-4">
-      <h3 class="font-semibold text-gray-800">{{ modoEdicionMarca() ? 'Editar Marca' : 'Nueva Marca' }}</h3>
-      <button (click)="cerrarModalMarca()" class="text-gray-400 hover:text-gray-600">✕</button>
+<div *ngIf="mostrarModalMarca()" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden">
+    <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+      <h3 class="text-base font-bold text-gray-800">{{ modoEdicionMarca() ? 'Editar Marca' : 'Nueva Marca' }}</h3>
+      <button (click)="cerrarModalMarca()" class="text-gray-400 hover:text-gray-600 p-1 rounded-lg">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
     </div>
-    <label class="block text-sm text-gray-600 mb-1">Nombre de la marca</label>
-    <input type="text" [(ngModel)]="formularioMarca.nombre" placeholder="Ej: MikroTik"
-      class="w-full border rounded-lg px-3 py-2 text-sm mb-6 focus:outline-none focus:ring-2 focus:ring-red-500" />
-    <div class="flex justify-end gap-3">
-      <button (click)="cerrarModalMarca()" class="px-4 py-2 rounded-lg border text-sm text-gray-600">Cancelar</button>
-      <button (click)="guardarMarca()" class="px-4 py-2 rounded-lg bg-red-600 text-white text-sm">
+    <div class="p-6">
+      <label class="block text-xs font-semibold text-gray-600 mb-1">Nombre de la marca</label>
+      <input type="text" [(ngModel)]="formularioMarca.nombre" placeholder="Ej: MikroTik"
+        class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500" />
+    </div>
+    <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100">
+      <button (click)="cerrarModalMarca()" class="px-5 py-2 text-xs font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors">Cancelar</button>
+      <button (click)="guardarMarca()" class="px-5 py-2 text-xs font-semibold text-white bg-red-700 hover:bg-red-800 rounded-xl shadow-sm transition-colors">
         {{ modoEdicionMarca() ? 'Guardar cambios' : 'Crear marca' }}
       </button>
     </div>
   </div>
 </div>
 
-<div *ngIf="mostrarConfirmarEliminarMarca()" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-  <div class="bg-white rounded-xl shadow-lg w-full max-w-sm p-6 text-center">
-    <p class="text-gray-700 mb-6">¿Seguro que deseas eliminar esta marca?</p>
-    <div class="flex justify-center gap-3">
-      <button (click)="cancelarEliminarMarca()" class="px-4 py-2 rounded-lg border text-sm text-gray-600">Cancelar</button>
-      <button (click)="confirmarEliminarMarcaReal()" class="px-4 py-2 rounded-lg bg-red-600 text-white text-sm">Eliminar</button>
+<div *ngIf="mostrarConfirmarEliminarMarca()" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
+    <div class="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mx-auto mb-4">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+      </svg>
+    </div>
+    <h3 class="text-base font-bold text-gray-800 mb-2">¿Confirmar eliminación?</h3>
+    <p class="text-xs text-gray-500 mb-6">Esta acción eliminará la marca de manera permanente.</p>
+    <div class="flex items-center justify-center gap-3">
+      <button (click)="cancelarEliminarMarca()" class="w-full py-2.5 text-xs font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors">Cancelar</button>
+      <button (click)="confirmarEliminarMarcaReal()" class="w-full py-2.5 text-xs font-semibold text-white bg-red-600 hover:bg-red-700 rounded-xl transition-colors">Sí, eliminar</button>
     </div>
   </div>
 </div>
 
 <!-- ====== MODAL TIPO DE EQUIPO ====== -->
-<div *ngIf="mostrarModalTipoEquipo()" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-  <div class="bg-white rounded-xl shadow-lg w-full max-w-sm p-6">
-    <div class="flex justify-between items-center mb-4">
-      <h3 class="font-semibold text-gray-800">{{ modoEdicionTipoEquipo() ? 'Editar Tipo' : 'Nuevo Tipo' }}</h3>
-      <button (click)="cerrarModalTipoEquipo()" class="text-gray-400 hover:text-gray-600">✕</button>
+<div *ngIf="mostrarModalTipoEquipo()" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden">
+    <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+      <h3 class="text-base font-bold text-gray-800">{{ modoEdicionTipoEquipo() ? 'Editar Tipo' : 'Nuevo Tipo' }}</h3>
+      <button (click)="cerrarModalTipoEquipo()" class="text-gray-400 hover:text-gray-600 p-1 rounded-lg">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
     </div>
-    <label class="block text-sm text-gray-600 mb-1">Nombre</label>
-    <input type="text" [(ngModel)]="formularioTipoEquipo.nombre" placeholder="Ej: Router"
-      class="w-full border rounded-lg px-3 py-2 text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-red-500" />
-    <label class="block text-sm text-gray-600 mb-1">Descripción</label>
-    <textarea [(ngModel)]="formularioTipoEquipo.descripcion" placeholder="Descripción del tipo de equipo"
-      class="w-full border rounded-lg px-3 py-2 text-sm mb-6 focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
-    <div class="flex justify-end gap-3">
-      <button (click)="cerrarModalTipoEquipo()" class="px-4 py-2 rounded-lg border text-sm text-gray-600">Cancelar</button>
-      <button (click)="guardarTipoEquipo()" class="px-4 py-2 rounded-lg bg-red-600 text-white text-sm">
+    <div class="p-6 space-y-4">
+      <div>
+        <label class="block text-xs font-semibold text-gray-600 mb-1">Nombre</label>
+        <input type="text" [(ngModel)]="formularioTipoEquipo.nombre" placeholder="Ej: Router"
+          class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500" />
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-gray-600 mb-1">Descripción</label>
+        <textarea [(ngModel)]="formularioTipoEquipo.descripcion" rows="3" placeholder="Descripción del tipo de equipo"
+          class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 resize-none"></textarea>
+      </div>
+    </div>
+    <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100">
+      <button (click)="cerrarModalTipoEquipo()" class="px-5 py-2 text-xs font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors">Cancelar</button>
+      <button (click)="guardarTipoEquipo()" class="px-5 py-2 text-xs font-semibold text-white bg-red-700 hover:bg-red-800 rounded-xl shadow-sm transition-colors">
         {{ modoEdicionTipoEquipo() ? 'Guardar cambios' : 'Crear tipo' }}
       </button>
     </div>
   </div>
 </div>
 
-<div *ngIf="mostrarConfirmarEliminarTipoEquipo()" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-  <div class="bg-white rounded-xl shadow-lg w-full max-w-sm p-6 text-center">
-    <p class="text-gray-700 mb-6">¿Seguro que deseas eliminar este tipo de equipo?</p>
-    <div class="flex justify-center gap-3">
-      <button (click)="cancelarEliminarTipoEquipo()" class="px-4 py-2 rounded-lg border text-sm text-gray-600">Cancelar</button>
-      <button (click)="confirmarEliminarTipoEquipoReal()" class="px-4 py-2 rounded-lg bg-red-600 text-white text-sm">Eliminar</button>
+<div *ngIf="mostrarConfirmarEliminarTipoEquipo()" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
+    <div class="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mx-auto mb-4">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+      </svg>
+    </div>
+    <h3 class="text-base font-bold text-gray-800 mb-2">¿Confirmar eliminación?</h3>
+    <p class="text-xs text-gray-500 mb-6">Esta acción eliminará el tipo de equipo de manera permanente.</p>
+    <div class="flex items-center justify-center gap-3">
+      <button (click)="cancelarEliminarTipoEquipo()" class="w-full py-2.5 text-xs font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors">Cancelar</button>
+      <button (click)="confirmarEliminarTipoEquipoReal()" class="w-full py-2.5 text-xs font-semibold text-white bg-red-600 hover:bg-red-700 rounded-xl transition-colors">Sí, eliminar</button>
     </div>
   </div>
 </div>

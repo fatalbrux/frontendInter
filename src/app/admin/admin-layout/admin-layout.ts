@@ -1,6 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { NotificacionesService } from '../../core/services/notificaciones'; // ajusta la ruta según donde esté tu layout
+import { CommonModule } from '@angular/common'; // 👈 agrega este import arriba
+import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
+import { filter, map } from 'rxjs/operators';
+import { OnInit } from '@angular/core';
+import { DashboardService } from '../../core/services/dashboard';
+
 
 interface MenuItem {
   label: string;
@@ -29,12 +36,19 @@ const ICONS = {
 @Component({
   selector: 'app-admin-layout',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive], // <-- agregué RouterLink y RouterLinkActive, se usan en el HTML
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, CommonModule], // <-- agregué RouterLink y RouterLinkActive, se usan en el HTML
   templateUrl: './admin-layout.html',
   styleUrl: './admin-layout.css',
 })
-export class AdminLayout {
+export class AdminLayout implements OnInit{
+  private readonly dashboardService = inject(DashboardService);
+  morososCount = signal<number>(0);
+
+  protected readonly notificaciones = inject(NotificacionesService);
   sidebarCollapsed = false;
+
+  private readonly router = inject(Router);
+  private readonly activatedRoute = inject(ActivatedRoute);
 
   // TODO: reemplazar con datos reales (AuthService / NotificacionesService)
   usuario = {
@@ -43,27 +57,58 @@ export class AdminLayout {
     iniciales: 'A',
   };
   notificationCount = 7;
-  pageTitle = 'Clientes'; // TODO: setear desde route.data o un breadcrumb service
+  pageTitle = signal<string>('');
+  //pageTitle = 'Clientes'; // TODO: setear desde route.data o un breadcrumb service
 
-  menuItems: MenuItem[];
+ private readonly baseMenuItems: Omit<MenuItem, 'badge'>[];
+
+menuItems = computed<MenuItem[]>(() =>
+  this.baseMenuItems.map((item) =>
+    item.route === '/admin/morosos'
+      ? { ...item, badge: this.morososCount() || undefined }
+      : item
+  )
+);
 
   constructor(private sanitizer: DomSanitizer) {
-    // Rutas absolutas bajo /admin, tal como definiste en app.routes.ts.
-    // "Morosos" no es un módulo aparte: filtra clientes con estado
-    // "Suspendido" / "Corte de servicio" — por eso apunta a /admin/clientes.
-    this.menuItems = [
-      { label: 'Dashboard', route: '/admin/dashboard', icon: this.trust(ICONS.dashboard), exact: true },
-      { label: 'Clientes', route: '/admin/clientes', icon: this.trust(ICONS.clientes) },
-      { label: 'Planes', route: '/admin/planes', icon: this.trust(ICONS.planes) },
-      { label: 'Equipos', route: '/admin/equipos', icon: this.trust(ICONS.equipos) },
-      { label: 'Cobros', route: '/admin/pagos', icon: this.trust(ICONS.cobros) },
-      { label: 'Instalaciones', route: '/admin/instalaciones', icon: this.trust(ICONS.instalaciones) },
-      { label: 'Zonas', route: '/admin/zonas', icon: this.trust(ICONS.zonas) },
-      { label: 'Morosos', route: '/admin/morosos', icon: this.trust(ICONS.morosos), badge: 4 },
-      { label: 'Reportes', route: '/admin/reportes', icon: this.trust(ICONS.reportes) },
-      
-    ];
-  }
+  this.baseMenuItems = [
+    { label: 'Dashboard', route: '/admin/dashboard', icon: this.trust(ICONS.dashboard), exact: true },
+    { label: 'Clientes', route: '/admin/clientes', icon: this.trust(ICONS.clientes) },
+    { label: 'Planes', route: '/admin/planes', icon: this.trust(ICONS.planes) },
+    { label: 'Equipos', route: '/admin/equipos', icon: this.trust(ICONS.equipos) },
+    { label: 'Cobros', route: '/admin/pagos', icon: this.trust(ICONS.cobros) },
+    { label: 'Instalaciones', route: '/admin/instalaciones', icon: this.trust(ICONS.instalaciones) },
+    { label: 'Zonas', route: '/admin/zonas', icon: this.trust(ICONS.zonas) },
+    { label: 'Morosos', route: '/admin/morosos', icon: this.trust(ICONS.morosos) },
+    { label: 'Reportes', route: '/admin/reportes', icon: this.trust(ICONS.reportes) },
+  ];
+}
+
+  ngOnInit(): void {
+  this.router.events.pipe(
+    filter((event) => event instanceof NavigationEnd),
+    map(() => {
+      let route = this.activatedRoute.firstChild;
+      while (route?.firstChild) {
+        route = route.firstChild;
+      }
+      return route?.snapshot.data['title'] ?? '';
+    })
+  ).subscribe((title: string) => {
+    this.pageTitle.set(title);
+  });
+
+  this.cargarMorososCount(); // nuevo
+}
+
+
+  cargarMorososCount(): void {
+  this.dashboardService.funMorosos().subscribe({
+    next: (res) => this.morososCount.set(res.length),
+    error: (err) => console.error(err),
+  });
+}
+
 
   toggleSidebar(): void {
     this.sidebarCollapsed = !this.sidebarCollapsed;

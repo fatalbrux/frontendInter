@@ -263,7 +263,7 @@ bancoSeleccionado = signal<BancoPago | null>(null);
     this.formularioPago = {
       ...this.formularioPagoVacio(),
       clienteId: cli.id,
-      monto: cli.plan?.precioMensual ?? 0,
+    monto: Number(cli.plan?.precioMensual ?? 0), // cambia aquí
       fechaPago: new Date().toISOString().slice(0, 10),
     };
     this.mostrarModalPago.set(true);
@@ -277,7 +277,7 @@ bancoSeleccionado = signal<BancoPago | null>(null);
   // Recalcula el monto automáticamente según los meses seleccionados y el precio del plan
   actualizarMontoPorMeses(): void {
     const cli = this.clienteParaPago();
-    const precio = cli?.plan?.precioMensual ?? 0;
+  const precio = Number(cli?.plan?.precioMensual ?? 0); // cambia aquí
     this.formularioPago.monto = precio * (this.formularioPago.mesesPagados ?? 1);
   }
 
@@ -405,4 +405,76 @@ diasParaVencimiento(cli: Cliente): number {
         return 'bg-gray-100 text-gray-500';
     }
   }
+
+  zonasParaFormulario = computed(() => {
+  const activas = this.listaZonas().filter(z => z.estado === 'Activa');
+  const actualId = this.formulario.zonaId;
+  const yaIncluida = activas.some(z => z.id === actualId);
+
+  if (actualId && !yaIncluida) {
+    const inactiva = this.listaZonas().find(z => z.id === actualId);
+    if (inactiva) return [...activas, inactiva];
+  }
+  return activas;
+});
+
+planesParaFormulario = computed(() => {
+  const activos = this.listaPlanes().filter(p => p.estado === 'Activo');
+  const actualId = this.formulario.planId;
+  const yaIncluido = activos.some(p => p.id === actualId);
+
+  if (actualId && !yaIncluido) {
+    const inactivo = this.listaPlanes().find(p => p.id === actualId);
+    if (inactivo) return [...activos, inactivo];
+  }
+  return activos;
+});
+
+  busquedaTexto = signal<string>('');
+filtroZonaId = signal<number | 'Todos'>('Todos');
+filtroEstado = signal<string>('Todos');
+
+clientesFiltrados = computed(() => {
+  const texto = this.busquedaTexto().trim().toLowerCase();
+  const zonaId = this.filtroZonaId();
+  const estado = this.filtroEstado();
+
+  return this.listaClientes().filter((cli) => {
+    const coincideTexto =
+      !texto ||
+      `${cli.nombres} ${cli.apellidos}`.toLowerCase().includes(texto) ||
+      cli.ci?.toLowerCase().includes(texto) ||
+      cli.codigo?.toLowerCase().includes(texto) ||
+      cli.telefono?.toLowerCase().includes(texto) ||
+      cli.usuario?.toLowerCase().includes(texto);
+
+    const coincideZona = zonaId === 'Todos' || cli.zona?.id === zonaId;
+
+    let coincideEstado = true;
+    if (estado === 'Moroso') {
+      coincideEstado = this.mesesDeCliente(cli) >= 1;
+    } else if (estado !== 'Todos') {
+      coincideEstado = cli.estado === estado;
+    }
+
+    return coincideTexto && coincideZona && coincideEstado;
+  });
+});
+
+private mesesDeCliente(cliente: Cliente): number {
+  const efectiva = this.fechaEfectivaVencimiento(cliente); // ya lo tienes en el archivo
+  if (!efectiva) return 0;
+
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+  if (efectiva >= hoy) return 0;
+
+  let meses = (hoy.getFullYear() - efectiva.getFullYear()) * 12 + (hoy.getMonth() - efectiva.getMonth());
+  if (hoy.getDate() < efectiva.getDate()) meses -= 1;
+  return Math.max(meses, 1);
+}
+
+
+
+
 }

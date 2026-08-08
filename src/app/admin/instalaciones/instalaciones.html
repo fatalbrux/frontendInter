@@ -1,166 +1,222 @@
 <div class="p-6">
-  <p class="text-xs text-gray-400">ISP Manager</p>
-  <div class="flex justify-between items-center mb-6">
+  <div class="flex items-center justify-between mb-6">
     <div>
-      <h1 class="text-2xl font-bold text-gray-800">Instalaciones</h1>
-      <p class="text-xs text-gray-400">Gestión de Instalaciones · {{ listaInstalaciones().length }} instalaciones registradas</p>
+      <h1 class="text-2xl font-bold text-gray-800">Gestión de Instalaciones</h1>
+      <p class="text-sm text-gray-500 font-medium mt-0.5">{{ listaInstalaciones().length }} instalaciones registradas</p>
     </div>
-    <button (click)="abrirModalCrear()"
-      class="bg-red-600 hover:bg-red-700 text-white text-sm font-medium px-4 py-2 rounded-lg">
-      + Registrar Instalación
+    <button (click)="abrirModalCrear()" class="flex items-center gap-2 bg-red-700 hover:bg-red-800 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-md transition-colors">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+      </svg>
+      Registrar Instalación
     </button>
   </div>
 
-  <!-- ====== LISTADO ====== -->
-  <div class="flex flex-col gap-4">
-    <div *ngFor="let instalacion of listaInstalaciones()"
-      class="bg-white rounded-xl shadow p-4 flex justify-between items-start">
-      <div class="flex gap-3">
-        <div class="bg-red-50 text-red-500 rounded-lg p-3 h-fit">🔧</div>
-        <div>
-          <h3 class="font-semibold text-gray-800">{{ nombreCliente(instalacion.clienteId) }}</h3>
-          <p class="text-xs text-gray-400">
-            Equipo: <span class="text-red-600 font-medium">{{ codigoEquipo(instalacion.equipoId) }}</span>
-            · {{ nombreZona(instalacion.zonaId) }}
-          </p>
-          <p class="text-xs text-gray-500 mt-1">📍 {{ instalacion.direccion }}</p>
-          <p *ngIf="instalacion.observaciones" class="text-xs text-gray-400 italic mt-1">"{{ instalacion.observaciones }}"</p>
-        </div>
-      </div>
+  <div class="relative mb-4">
+    <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-gray-400">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      </svg>
+    </span>
+    <input type="text" [ngModel]="busquedaInstalacion()" (ngModelChange)="busquedaInstalacion.set($event)"
+      placeholder="Buscar por cliente, código de equipo o dirección..."
+      class="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-700 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all">
+  </div>
 
-      <div class="text-right">
-        <p class="text-sm text-gray-700">{{ instalacion.fechaInstalacion | date:'yyyy-MM-dd' }}</p>
-        <div class="flex gap-2 mt-2 justify-end">
-          <button (click)="seleccionarParaEditar(instalacion)" class="text-xs text-amber-600 hover:underline">Editar</button>
-          <button (click)="eliminar(instalacion.id)" class="text-xs text-red-600 hover:underline">Eliminar</button>
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="divide-y divide-gray-100">
+      @for (instalacion of instalacionesFiltradas(); track instalacion.id) {
+        <div class="p-4 flex justify-between items-start hover:bg-gray-50/80 transition-colors">
+          <div class="flex gap-3">
+            <div class="w-10 h-10 rounded-xl bg-red-50 text-red-500 flex items-center justify-center shrink-0">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M13.5 6.75l-2.943 3.523c-.396.474-.74 1.058-1.052 1.552a4.5 4.5 0 006.336 6.335c.494-.312 1.078-.656 1.552-1.052L21.75 13.5m-9.75-6.75L9.75 4.5m2.25 2.25L14.25 4.5M2.25 12l2.25-2.25M2.25 12l2.25 2.25M2.25 12h9"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="font-bold text-gray-900 text-sm">{{ instalacion.cliente?.nombres }} {{ instalacion.cliente?.apellidos }}</h3>
+              <p class="text-xs text-gray-400 mt-0.5">
+                Equipo: <span class="text-red-600 font-semibold">{{ instalacion.equipo?.codigo || '—' }}</span>
+                · {{ instalacion.zona?.nombre || '—' }}
+              </p>
+              <p class="text-xs text-gray-500 mt-1">📍 {{ instalacion.direccion }}</p>
+              @if (instalacion.observaciones) {
+                <p class="text-xs text-gray-400 italic mt-1">"{{ instalacion.observaciones }}"</p>
+              }
+            </div>
+          </div>
+
+          <div class="text-right">
+            <p class="text-xs font-semibold text-gray-700">{{ instalacion.fechaInstalacion | date:'dd/MM/yyyy' }}</p>
+            <div class="flex gap-1.5 mt-2 justify-end">
+              <button (click)="seleccionarParaEditar(instalacion)" title="Editar" class="p-1.5 rounded-lg bg-amber-50 text-amber-500 hover:bg-amber-100 transition-colors">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+              </button>
+              <button (click)="eliminar(instalacion.id)" title="Eliminar" class="p-1.5 rounded-lg bg-red-50 text-red-400 hover:bg-red-100 transition-colors">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
+      } @empty {
+        <p class="text-sm text-gray-400 text-center py-8">No hay instalaciones registradas.</p>
+      }
     </div>
-
-    <p *ngIf="listaInstalaciones().length === 0" class="text-sm text-gray-400 text-center py-6">
-      No hay instalaciones registradas.
-    </p>
   </div>
 </div>
 
 <!-- ====== MODAL REGISTRAR/EDITAR INSTALACIÓN ====== -->
-<div *ngIf="mostrarModal()" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-  <div class="bg-white rounded-xl shadow-lg w-full max-w-sm p-6 max-h-[90vh] overflow-y-auto">
-    <div class="flex justify-between items-center mb-4">
-      <h3 class="font-semibold text-gray-800">{{ modoEdicion() ? 'Editar Instalación' : 'Registrar Nueva Instalación' }}</h3>
-      <button (click)="cerrarModal()" class="text-gray-400 hover:text-gray-600">✕</button>
-    </div>
+@if (mostrarModal()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden my-8">
 
-    <!-- ---- BUSCAR CLIENTE POR CI ---- -->
-    <div *ngIf="!clienteSeleccionado()" class="mb-4">
-      <label class="block text-sm text-gray-600 mb-1">Cliente (buscar por CI)</label>
-      <input type="text" [ngModel]="busquedaCi()" (ngModelChange)="busquedaCi.set($event)"
-        placeholder="Escribe el carnet de identidad..."
-        class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500" />
-
-      <div *ngIf="clientesEncontrados().length > 0"
-        class="mt-2 border rounded-lg divide-y max-h-40 overflow-y-auto">
-        <button *ngFor="let cliente of clientesEncontrados()" (click)="seleccionarCliente(cliente)"
-          class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 flex justify-between items-center">
-          <span class="text-gray-700">{{ cliente.nombres }} {{ cliente.apellidos }}</span>
-          <span class="text-xs text-gray-400">{{ cliente.codigo }} · CI {{ cliente.ci }}</span>
+      <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+        <h3 class="text-base font-bold text-gray-800">{{ modoEdicion() ? 'Editar Instalación' : 'Registrar Nueva Instalación' }}</h3>
+        <button (click)="cerrarModal()" class="text-gray-400 hover:text-gray-600 p-1 rounded-lg">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
       </div>
 
-      <p *ngIf="busquedaCi().trim() && clientesEncontrados().length === 0" class="text-xs text-gray-400 mt-2">
-        No se encontró ningún cliente con ese CI.
-      </p>
-    </div>
+      <div class="p-6 max-h-[75vh] overflow-y-auto">
 
-    <!-- ---- CLIENTE SELECCIONADO ---- -->
-    <div *ngIf="clienteSeleccionado() as cliente" class="mb-4">
-      <div class="flex justify-between items-center mb-1">
-        <label class="block text-sm text-gray-600">Cliente</label>
-        <button (click)="quitarClienteSeleccionado()" class="text-xs text-red-600 hover:underline">Cambiar</button>
+        <!-- ---- BUSCAR CLIENTE ---- -->
+        @if (!clienteSeleccionado()) {
+          <div class="mb-4">
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Cliente (buscar por CI)</label>
+            <input type="text" [ngModel]="busquedaCi()" (ngModelChange)="busquedaCi.set($event)"
+              placeholder="Escribe el carnet de identidad..."
+              class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500" />
+
+            @if (clientesEncontrados().length > 0) {
+              <div class="mt-2 border border-gray-200 rounded-xl divide-y divide-gray-100 max-h-40 overflow-y-auto">
+                @for (cliente of clientesEncontrados(); track cliente.id) {
+                  <button (click)="seleccionarCliente(cliente)"
+                    class="w-full text-left px-3 py-2 text-xs hover:bg-gray-50 flex justify-between items-center transition-colors">
+                    <span class="text-gray-800 font-medium">{{ cliente.nombres }} {{ cliente.apellidos }}</span>
+                    <span class="text-gray-400">{{ cliente.codigo }} · CI {{ cliente.ci }}</span>
+                  </button>
+                }
+              </div>
+            }
+            @if (busquedaCi().trim() && clientesEncontrados().length === 0) {
+              <p class="text-xs text-gray-400 mt-2">No se encontró ningún cliente con ese CI.</p>
+            }
+          </div>
+        }
+
+        <!-- ---- CLIENTE SELECCIONADO ---- -->
+        @if (clienteSeleccionado(); as cliente) {
+          <div class="mb-4">
+            <div class="flex justify-between items-center mb-1">
+              <label class="block text-xs font-semibold text-gray-600">Cliente</label>
+              <button (click)="quitarClienteSeleccionado()" class="text-xs text-red-600 hover:underline font-semibold">Cambiar</button>
+            </div>
+            <div class="border border-gray-200 rounded-xl px-3 py-2 bg-gray-50">
+              <p class="text-xs text-gray-800 font-bold">{{ cliente.nombres }} {{ cliente.apellidos }}</p>
+              <p class="text-[11px] text-gray-400">{{ cliente.codigo }} · CI {{ cliente.ci }}</p>
+            </div>
+          </div>
+        }
+
+        <!-- ---- BUSCAR EQUIPO ---- -->
+        @if (!equipoSeleccionado()) {
+          <div class="mb-4">
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Equipo a instalar (buscar por código)</label>
+            <input type="text" [ngModel]="busquedaCodigoEquipo()" (ngModelChange)="busquedaCodigoEquipo.set($event)"
+              placeholder="Ej: RT-003"
+              class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500" />
+
+            @if (equiposEncontrados().length > 0) {
+              <div class="mt-2 border border-gray-200 rounded-xl divide-y divide-gray-100 max-h-40 overflow-y-auto">
+                @for (equipo of equiposEncontrados(); track equipo.id) {
+                  <button (click)="seleccionarEquipo(equipo)"
+                    class="w-full text-left px-3 py-2 text-xs hover:bg-gray-50 flex justify-between items-center transition-colors">
+                    <span class="text-red-600 font-semibold">{{ equipo.codigo }}</span>
+                    <span class="text-gray-400">{{ equipo.modelo }} · {{ equipo.nroSerie }}</span>
+                  </button>
+                }
+              </div>
+            }
+            @if (busquedaCodigoEquipo().trim() && equiposEncontrados().length === 0) {
+              <p class="text-xs text-gray-400 mt-2">No se encontró ningún equipo disponible con ese código.</p>
+            }
+          </div>
+        }
+
+        <!-- ---- EQUIPO SELECCIONADO ---- -->
+        @if (equipoSeleccionado(); as equipo) {
+          <div class="mb-4">
+            <div class="flex justify-between items-center mb-1">
+              <label class="block text-xs font-semibold text-gray-600">Equipo</label>
+              <button (click)="quitarEquipoSeleccionado()" class="text-xs text-red-600 hover:underline font-semibold">Cambiar</button>
+            </div>
+            <div class="border border-gray-200 rounded-xl px-3 py-2 bg-gray-50">
+              <p class="text-xs text-gray-800 font-bold">{{ equipo.codigo }}</p>
+              <p class="text-[11px] text-gray-400">{{ equipo.modelo }} · {{ equipo.nroSerie }}</p>
+            </div>
+          </div>
+        }
+
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Fecha de instalación</label>
+            <input type="date" [(ngModel)]="fechaInstalacion"
+              class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Zona</label>
+            <select [ngModel]="zonaIdSeleccionada()" (ngModelChange)="zonaIdSeleccionada.set($event)"
+              class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
+              <option [ngValue]="undefined" disabled>— Seleccionar zona —</option>
+              @for (zona of listaZonas(); track zona.id) {
+                <option [ngValue]="zona.id">{{ zona.nombre }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label class="block text-xs font-semibold text-gray-600 mb-1">Dirección</label>
+          <input type="text" [ngModel]="direccion()" (ngModelChange)="direccion.set($event)"
+            placeholder="Dirección de instalación"
+            class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500" />
+        </div>
+
+        <div class="mb-6">
+          <label class="block text-xs font-semibold text-gray-600 mb-1">Observaciones</label>
+          <textarea [ngModel]="observaciones()" (ngModelChange)="observaciones.set($event)"
+            placeholder="Detalles técnicos, señal, incidencias..."
+            class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500"></textarea>
+        </div>
+
+        <div class="flex items-center justify-end gap-3">
+          <button (click)="cerrarModal()" class="px-5 py-2 text-xs font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors">Cancelar</button>
+          <button (click)="guardar()"
+            [disabled]="!clienteSeleccionado() || !equipoSeleccionado() || !zonaIdSeleccionada()"
+            class="px-5 py-2 text-xs font-semibold text-white bg-red-700 hover:bg-red-800 rounded-xl shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            {{ modoEdicion() ? 'Guardar cambios' : 'Registrar instalación' }}
+          </button>
+        </div>
       </div>
-      <div class="border rounded-lg px-3 py-2 bg-gray-50">
-        <p class="text-sm text-gray-800 font-medium">{{ cliente.nombres }} {{ cliente.apellidos }}</p>
-        <p class="text-xs text-gray-400">{{ cliente.codigo }} · CI {{ cliente.ci }}</p>
-      </div>
-    </div>
-
-    <!-- ---- BUSCAR EQUIPO POR CÓDIGO ---- -->
-    <div *ngIf="!equipoSeleccionado()" class="mb-4">
-      <label class="block text-sm text-gray-600 mb-1">Equipo a instalar (buscar por código)</label>
-      <input type="text" [ngModel]="busquedaCodigoEquipo()" (ngModelChange)="busquedaCodigoEquipo.set($event)"
-        placeholder="Ej: RT-003"
-        class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500" />
-
-      <div *ngIf="equiposEncontrados().length > 0"
-        class="mt-2 border rounded-lg divide-y max-h-40 overflow-y-auto">
-        <button *ngFor="let equipo of equiposEncontrados()" (click)="seleccionarEquipo(equipo)"
-          class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 flex justify-between items-center">
-          <span class="text-red-600 font-medium">{{ equipo.codigo }}</span>
-          <span class="text-xs text-gray-400">{{ equipo.modelo }} · {{ equipo.nroSerie }}</span>
-        </button>
-      </div>
-
-      <p *ngIf="busquedaCodigoEquipo().trim() && equiposEncontrados().length === 0" class="text-xs text-gray-400 mt-2">
-        No se encontró ningún equipo disponible con ese código.
-      </p>
-    </div>
-
-    <!-- ---- EQUIPO SELECCIONADO ---- -->
-    <div *ngIf="equipoSeleccionado() as equipo" class="mb-4">
-      <div class="flex justify-between items-center mb-1">
-        <label class="block text-sm text-gray-600">Equipo</label>
-        <button (click)="quitarEquipoSeleccionado()" class="text-xs text-red-600 hover:underline">Cambiar</button>
-      </div>
-      <div class="border rounded-lg px-3 py-2 bg-gray-50">
-        <p class="text-sm text-gray-800 font-medium">{{ equipo.codigo }}</p>
-        <p class="text-xs text-gray-400">{{ equipo.modelo }} · {{ equipo.nroSerie }}</p>
-      </div>
-    </div>
-
-    <div class="grid grid-cols-2 gap-4 mb-4">
-      <div>
-        <label class="block text-sm text-gray-600 mb-1">Fecha de instalación</label>
-        <input type="date" [(ngModel)]="fechaInstalacion"
-          class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500" />
-      </div>
-      <div>
-        <label class="block text-sm text-gray-600 mb-1">Zona</label>
-        <select [ngModel]="zonaIdSeleccionada()" (ngModelChange)="zonaIdSeleccionada.set($event)"
-          class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500">
-          <option [ngValue]="undefined" disabled>— Seleccionar zona —</option>
-          <option *ngFor="let zona of listaZonas()" [ngValue]="zona.id">{{ zona.nombre }}</option>
-        </select>
-      </div>
-    </div>
-
-    <label class="block text-sm text-gray-600 mb-1">Dirección</label>
-    <input type="text" [ngModel]="direccion()" (ngModelChange)="direccion.set($event)"
-      placeholder="Dirección de instalación"
-      class="w-full border rounded-lg px-3 py-2 text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-red-500" />
-
-    <label class="block text-sm text-gray-600 mb-1">Observaciones</label>
-    <textarea [ngModel]="observaciones()" (ngModelChange)="observaciones.set($event)"
-      placeholder="Detalles técnicos, señal, incidencias..."
-      class="w-full border rounded-lg px-3 py-2 text-sm mb-6 focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
-
-    <div class="flex justify-end gap-3">
-      <button (click)="cerrarModal()" class="px-4 py-2 rounded-lg border text-sm text-gray-600">Cancelar</button>
-      <button (click)="guardar()"
-        [disabled]="!clienteSeleccionado() || !equipoSeleccionado() || !zonaIdSeleccionada()"
-        class="px-4 py-2 rounded-lg bg-red-600 text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed">
-        {{ modoEdicion() ? 'Guardar cambios' : 'Registrar instalación' }}
-      </button>
     </div>
   </div>
-</div>
+}
 
 <!-- ====== CONFIRMAR ELIMINAR ====== -->
-<div *ngIf="mostrarConfirmarEliminar()" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-  <div class="bg-white rounded-xl shadow-lg w-full max-w-sm p-6 text-center">
-    <p class="text-gray-700 mb-6">¿Seguro que deseas eliminar esta instalación?</p>
-    <div class="flex justify-center gap-3">
-      <button (click)="cancelarEliminar()" class="px-4 py-2 rounded-lg border text-sm text-gray-600">Cancelar</button>
-      <button (click)="confirmarEliminarReal()" class="px-4 py-2 rounded-lg bg-red-600 text-white text-sm">Eliminar</button>
+@if (mostrarConfirmarEliminar()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
+      <div class="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mx-auto mb-4">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+        </svg>
+      </div>
+      <h3 class="text-base font-bold text-gray-800 mb-2">¿Confirmar eliminación?</h3>
+      <p class="text-xs text-gray-500 mb-6">Esta acción eliminará la instalación de manera permanente.</p>
+      <div class="flex items-center justify-center gap-3">
+        <button (click)="cancelarEliminar()" class="w-full py-2.5 text-xs font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors">Cancelar</button>
+        <button (click)="confirmarEliminarReal()" class="w-full py-2.5 text-xs font-semibold text-white bg-red-600 hover:bg-red-700 rounded-xl transition-colors">Sí, eliminar</button>
+      </div>
     </div>
   </div>
-</div>
+}

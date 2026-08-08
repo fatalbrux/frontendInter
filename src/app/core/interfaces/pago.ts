@@ -5,6 +5,8 @@ export interface ClienteResumenPago {
   id: number;
   nombres: string;
   apellidos: string;
+  usuario?: string; // 👈 agregar
+
 }
 
 export interface Pago {

@@ -38,4 +38,13 @@ export class Morosos implements OnInit {
       default: return 'bg-gray-100 text-gray-500';
     }
   }
+
+  clasePuntoEstado(estado: string): string {
+  switch (estado) {
+    case 'Activo': return 'bg-emerald-500';
+    case 'Suspendido': return 'bg-amber-500';
+    case 'Corte de servicio': return 'bg-rose-500';
+    default: return 'bg-gray-400';
+  }
+}
 }

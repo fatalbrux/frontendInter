@@ -1,6 +1,6 @@
 <div class="p-6">
   <h1 class="text-2xl font-bold text-gray-800">Gestión de Morosos</h1>
-  <p class="text-xs text-gray-400 mb-6">{{ listaMorosos().length }} clientes con pagos vencidos</p>
+  <p class="text-sm text-gray-500 font-medium mt-0.5">{{ listaMorosos().length }} clientes con pagos vencidos</p>
 
   @if (!cargando()) {
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
@@ -28,45 +28,50 @@
       </div>
     }
 
-    <div class="bg-white rounded-xl shadow overflow-x-auto">
-      <table class="w-full text-sm">
-        <thead>
-          <tr class="text-left text-gray-400 border-b">
-            <th class="py-3 px-4">Cliente</th>
-            <th class="py-3 px-4">Código</th>
-            <th class="py-3 px-4">Zona</th>
-            <th class="py-3 px-4">Precio/mes</th>
-            <th class="py-3 px-4">Meses deuda</th>
-            <th class="py-3 px-4">Deuda total</th>
-            <th class="py-3 px-4">Último pago</th>
-            <th class="py-3 px-4">Estado</th>
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+  <div class="overflow-x-auto">
+    <table class="w-full text-left text-xs border-collapse">
+      <thead>
+        <tr class="text-gray-600 font-bold border-b border-gray-100 bg-gray-50/50">
+          <th class="py-3.5 px-4">Cliente</th>
+          <th class="py-3.5 px-4">Código</th>
+          <th class="py-3.5 px-4">Zona</th>
+          <th class="py-3.5 px-4">Precio/mes</th>
+          <th class="py-3.5 px-4">Meses deuda</th>
+          <th class="py-3.5 px-4">Deuda total</th>
+          <th class="py-3.5 px-4">Último pago</th>
+          <th class="py-3.5 px-4">Estado</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100 text-gray-700">
+        @for (cli of listaMorosos(); track cli.id) {
+          <tr class="hover:bg-gray-50/80 transition-colors">
+            <td class="py-3 px-4">
+              <p class="font-bold text-gray-900">{{ cli.nombres }} {{ cli.apellidos }}</p>
+              <p class="text-[11px] text-gray-400">{{ cli.ci || '—' }}</p>
+            </td>
+            <td class="py-3 px-4 font-bold text-red-600 whitespace-nowrap">{{ cli.codigo }}</td>
+            <td class="py-3 px-4 font-medium text-gray-600">{{ cli.zona || '—' }}</td>
+            <td class="py-3 px-4 font-medium text-gray-600">Bs. {{ cli.precioMensual }}</td>
+            <td class="py-3 px-4">
+              <span class="bg-rose-50 text-rose-600 text-[11px] font-semibold px-2 py-0.5 rounded-full">{{ cli.mesesDeuda }}</span>
+            </td>
+            <td class="py-3 px-4 font-bold text-rose-600">Bs. {{ cli.deudaTotal }}</td>
+            <td class="py-3 px-4 font-medium text-gray-600">{{ cli.ultimoPago ? (cli.ultimoPago | date:'dd/MM/yyyy') : '—' }}</td>
+            <td class="py-3 px-4">
+              <span [ngClass]="claseEstado(cli.estado)" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold">
+                <span [ngClass]="clasePuntoEstado(cli.estado)" class="w-1.5 h-1.5 rounded-full"></span>
+                {{ cli.estado }}
+              </span>
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          @for (cli of listaMorosos(); track cli.id) {
-            <tr class="border-b last:border-0 hover:bg-gray-50">
-              <td class="py-3 px-4">
-                <p class="text-gray-800 font-medium">{{ cli.nombres }} {{ cli.apellidos }}</p>
-                <p class="text-gray-400 text-xs">{{ cli.ci || '—' }}</p>
-              </td>
-              <td class="py-3 px-4 text-red-600 font-medium">{{ cli.codigo }}</td>
-              <td class="py-3 px-4 text-gray-600">{{ cli.zona || '—' }}</td>
-              <td class="py-3 px-4 text-gray-600">Bs. {{ cli.precioMensual }}</td>
-              <td class="py-3 px-4">
-                <span class="text-xs px-2 py-0.5 rounded-full bg-rose-100 text-rose-600">{{ cli.mesesDeuda }}</span>
-              </td>
-              <td class="py-3 px-4 font-semibold text-rose-600">Bs. {{ cli.deudaTotal }}</td>
-              <td class="py-3 px-4 text-gray-600">{{ cli.ultimoPago || '—' }}</td>
-              <td class="py-3 px-4">
-                <span class="text-xs px-2 py-0.5 rounded-full" [ngClass]="claseEstado(cli.estado)">{{ cli.estado }}</span>
-              </td>
-            </tr>
-          }
-          @empty {
-            <tr><td colspan="8" class="py-6 text-center text-gray-400">No hay clientes morosos.</td></tr>
-          }
-        </tbody>
-      </table>
-    </div>
+        }
+        @empty {
+          <tr><td colspan="8" class="text-center py-6 text-gray-400 font-medium">No hay clientes morosos.</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
   }
 </div>
