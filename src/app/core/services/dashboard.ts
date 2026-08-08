@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { DashboardResumen, DeudorCorte, ProximoVencimiento } from '../interfaces/dashboard';
 import { Cliente } from '../interfaces/cliente';
 import { ClienteMoroso } from '../interfaces/dashboard';
-import { environment } from '../../../environments/environment.development';
+import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class DashboardService {
