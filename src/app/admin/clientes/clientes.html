@@ -314,18 +314,39 @@
           </p>
         </div>
 
-        <div class="mb-4">
-          <label class="block text-xs font-semibold text-gray-600 mb-1">Meses a pagar</label>
-          <select [(ngModel)]="formularioPago.mesesPagados" name="mesesPagados" (ngModelChange)="actualizarMontoPorMeses()"
-            class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
-            <option [ngValue]="1">1 mes</option>
-            <option [ngValue]="2">2 meses</option>
-            <option [ngValue]="3">3 meses</option>
-            <option [ngValue]="6">6 meses</option>
-            <option [ngValue]="12">12 meses</option>
-          </select>
-          <p class="text-[11px] text-gray-500 mt-1">El pago cubre hasta el: {{ vencimientoPreview() }}</p>
-        </div>
+<div class="mb-4">
+  <label class="block text-xs font-semibold text-gray-600 mb-2">Meses a pagar</label>
+  <div class="grid grid-cols-4 gap-2">
+    @for (mes of mesesGridCliente(); track mes.fecha.getTime()) {
+      @if (mes.estado !== 'no-aplica') {
+        <button type="button" (click)="seleccionarMesGridCliente(mes)"
+          [disabled]="mes.estado === 'pagado' || (mes.estado === 'bloqueado-futuro' && !pagoAdelantadoCliente())"
+          class="rounded-xl border py-3 text-[11px] font-semibold text-center transition-colors capitalize"
+          [ngClass]="{
+            'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed': mes.estado === 'pagado',
+            'bg-gray-50 text-gray-300 border-gray-100 cursor-not-allowed': mes.estado === 'bloqueado-futuro' && !pagoAdelantadoCliente(),
+            'bg-white border-amber-200 text-amber-600 hover:border-amber-400 cursor-pointer': mes.estado === 'bloqueado-futuro' && pagoAdelantadoCliente(),
+            'bg-white border-gray-200 text-gray-600 hover:border-red-300 cursor-pointer': mes.estado === 'disponible',
+            'bg-red-600 border-red-600 text-white cursor-pointer': mes.estado === 'seleccionado'
+          }">
+          @if (mes.estado === 'pagado') { ✓ }
+          @if (mes.estado === 'bloqueado-futuro' && !pagoAdelantadoCliente()) { 🔒 }
+          {{ mes.label }}
+        </button>
+      } @else {
+        <div class="rounded-xl border border-dashed border-gray-100 py-3 text-[11px] text-gray-300 text-center">—</div>
+      }
+    }
+  </div>
+
+  <label class="flex items-center gap-2 mt-3 cursor-pointer select-none">
+    <input type="checkbox" [checked]="pagoAdelantadoCliente()" (change)="togglePagoAdelantadoCliente()"
+      class="w-4 h-4 rounded border-gray-300 text-amber-500 focus:ring-amber-400" />
+    <span class="text-[11px] text-gray-600">🎫 Pago adelantado — habilita el mes actual y los siguientes del año</span>
+  </label>
+
+  <p class="text-[11px] text-gray-500 mt-2">{{ mesesAPagarCliente() }} mes(es) seleccionado(s) — El pago cubre hasta el: {{ vencimientoPreview() }}</p>
+</div>
 
         <div class="mb-4">
           <label class="block text-xs font-semibold text-gray-600 mb-2">Método de pago</label>
