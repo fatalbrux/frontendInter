@@ -57,7 +57,7 @@ export class Clientes implements OnInit {
   if (!base) return null;
 
   const fecha = this.parseFechaLocal(base);
-  fecha.setMonth(fecha.getMonth() + 1);
+  fecha.setMonth(fecha.getMonth() + 2);
   return fecha;
 }
 
@@ -276,6 +276,7 @@ abrirModalPago(cli: Cliente): void {
     fechaPago: new Date().toISOString().slice(0, 10),
   };
   this.mostrarModalPago.set(true);
+  this.anioGridCliente.set(new Date().getFullYear()); // agrega esta línea
 }
 
   cerrarModalPago(): void {
@@ -312,7 +313,7 @@ guardarPago(): void {
 
   const vencimientoAnterior = this.fechaBaseVencimiento(cli);
   const ultimoMes = seleccionados[seleccionados.length - 1].fecha;
-  const nuevoVencimiento = new Date(ultimoMes.getFullYear(), ultimoMes.getMonth() + 1, 1);
+  const nuevoVencimiento = new Date(ultimoMes.getFullYear(), ultimoMes.getMonth() + 2, 1);
 
   const dato: PagoPayload = {
     ...this.formularioPago,
@@ -498,76 +499,84 @@ private mesesDeCliente(cliente: Cliente): number {
 mesesAPagarCliente = signal<number>(1);
 pagoAdelantadoCliente = signal<boolean>(false);
 
+private formatMesAnio(fecha: Date): string {
+  const texto = fecha.toLocaleDateString('es-BO', { month: 'long', year: 'numeric' });
+  return texto.charAt(0).toUpperCase() + texto.slice(1);
+}
+
+anioGridCliente = signal<number>(new Date().getFullYear());
+readonly currentYear = new Date().getFullYear();
+
+cambiarAnioGridCliente(delta: number): void {
+  const nuevo = this.anioGridCliente() + delta;
+  if (nuevo < this.currentYear || nuevo > this.currentYear + 1) return;
+  this.anioGridCliente.set(nuevo);
+}
+
 mesesGridCliente = computed(() => {
   const cliente = this.clienteParaPago();
   if (!cliente) return [];
-  return this.generarMesesGrid(cliente, this.mesesAPagarCliente(), this.pagoAdelantadoCliente());
+  return this.generarMesesGrid(cliente, this.mesesAPagarCliente(), this.pagoAdelantadoCliente(), this.anioGridCliente());
 });
 
 private inicioDeMes(fecha: Date): Date {
   return new Date(fecha.getFullYear(), fecha.getMonth(), 1);
 }
 
-private generarMesesGrid(cliente: Cliente, mesesSeleccionados: number, adelanto: boolean): MesPago[] {
-  const anioActual = new Date().getFullYear();
+private mesRealmenteDebido(fechaCobrable: Date): Date {
+  return new Date(fechaCobrable.getFullYear(), fechaCobrable.getMonth() - 1, 1);
+}
+
+private generarMesesGrid(cliente: Cliente, mesesSeleccionados: number, adelanto: boolean, anio: number): MesPago[] {
   const hoy = new Date();
+  const anioActual = hoy.getFullYear();
   const mesActualIndex = hoy.getMonth();
 
   const inicioServicioRaw = cliente.fechaPrimerPago ?? cliente.fechaInstalacion ?? null;
   const inicioServicio = inicioServicioRaw ? this.inicioDeMes(this.parseFechaLocal(inicioServicioRaw)) : null;
 
   const vencimientoEfectivo = this.fechaEfectivaVencimiento(cliente);
-  const vencimientoMes = vencimientoEfectivo ? this.inicioDeMes(vencimientoEfectivo) : null;
+  const vencimientoMes = vencimientoEfectivo ? this.mesRealmenteDebido(this.inicioDeMes(vencimientoEfectivo)) : null;
 
   const meses: MesPago[] = [];
   for (let m = 0; m < 12; m++) {
-    const fechaMes = new Date(anioActual, m, 1);
+    const fechaMes = new Date(anio, m, 1);
     let estado: MesPago['estado'];
 
     if (inicioServicio && fechaMes < inicioServicio) {
       estado = 'no-aplica';
     } else if (vencimientoMes && fechaMes < vencimientoMes) {
       estado = 'pagado';
-    } else if (m < mesActualIndex) {
+    } else if (anio < anioActual || (anio === anioActual && m < mesActualIndex)) {
       estado = 'disponible';
     } else {
       estado = 'bloqueado-futuro';
     }
 
-    meses.push({
-      fecha: fechaMes,
-      label: fechaMes.toLocaleDateString('es-BO', { month: 'short' }),
-      estado,
-    });
+    meses.push({ fecha: fechaMes, label: fechaMes.toLocaleDateString('es-BO', { month: 'short' }), estado });
   }
 
-  let contados = 0;
-  return meses.map((m) => {
-    const esClickable = m.estado === 'disponible' || (adelanto && m.estado === 'bloqueado-futuro');
-    if (esClickable) {
-      contados++;
-      if (contados <= mesesSeleccionados) {
-        return { ...m, estado: 'seleccionado' as const };
-      }
-    }
-    return m;
-  });
+  const gridCompleto = this.gridAcumuladoHastaCliente(cliente, anio, adelanto);
+  const idsSeleccionados = new Set(gridCompleto.slice(0, mesesSeleccionados).map((f) => f.getTime()));
+
+  return meses.map((m) => idsSeleccionados.has(m.fecha.getTime()) ? { ...m, estado: 'seleccionado' as const } : m);
 }
 
 seleccionarMesGridCliente(mes: MesPago): void {
   if (mes.estado === 'no-aplica' || mes.estado === 'pagado') return;
   if (mes.estado === 'bloqueado-futuro' && !this.pagoAdelantadoCliente()) return;
 
-  const clickables = this.mesesGridCliente().filter(
-    (m) => m.estado === 'disponible' || m.estado === 'seleccionado' ||
-    (this.pagoAdelantadoCliente() && m.estado === 'bloqueado-futuro')
-  );
-  const idx = clickables.findIndex((m) => m.fecha.getTime() === mes.fecha.getTime());
+  const cliente = this.clienteParaPago();
+  if (!cliente) return;
+
+  const acumulado = this.gridAcumuladoHastaCliente(cliente, this.anioGridCliente(), this.pagoAdelantadoCliente());
+  const idx = acumulado.findIndex((f) => f.getTime() === mes.fecha.getTime());
   if (idx === -1) return;
 
   this.mesesAPagarCliente.set(idx + 1);
-  this.actualizarMontoPorMeses(); // recalcula formularioPago.monto
+  this.actualizarMontoPorMeses();
 }
+
 
 togglePagoAdelantadoCliente(): void {
   const nuevoValor = !this.pagoAdelantadoCliente();
@@ -576,7 +585,7 @@ togglePagoAdelantadoCliente(): void {
   if (!nuevoValor) {
     const cliente = this.clienteParaPago();
     if (cliente) {
-      const gridSinAdelanto = this.generarMesesGrid(cliente, 0, false);
+      const gridSinAdelanto = this.generarMesesGrid(cliente, 0, false, this.anioGridCliente());
       const totalDisponibles = gridSinAdelanto.filter((m) => m.estado === 'disponible').length;
       if (this.mesesAPagarCliente() > totalDisponibles) {
         this.mesesAPagarCliente.set(totalDisponibles);
@@ -587,6 +596,59 @@ togglePagoAdelantadoCliente(): void {
 }
 
 
+private gridAcumuladoHastaCliente(cliente: Cliente, anioLimite: number, adelanto: boolean): Date[] {
+  const hoy = new Date();
+  const anioActual = hoy.getFullYear();
+  const mesActualIndex = hoy.getMonth();
 
+  const inicioServicioRaw = cliente.fechaPrimerPago ?? cliente.fechaInstalacion ?? null;
+  const inicioServicio = inicioServicioRaw ? this.inicioDeMes(this.parseFechaLocal(inicioServicioRaw)) : null;
+
+  const vencimientoEfectivo = this.fechaEfectivaVencimiento(cliente);
+  const vencimientoMes = vencimientoEfectivo ? this.mesRealmenteDebido(this.inicioDeMes(vencimientoEfectivo)) : null;
+
+
+
+  const resultado: Date[] = [];
+  for (let anio = anioActual; anio <= anioLimite; anio++) {
+    for (let m = 0; m < 12; m++) {
+      const fechaMes = new Date(anio, m, 1);
+      if (inicioServicio && fechaMes < inicioServicio) continue;
+      if (vencimientoMes && fechaMes < vencimientoMes) continue;
+
+      const esPasado = anio < anioActual || (anio === anioActual && m < mesActualIndex);
+      if (esPasado || adelanto) resultado.push(fechaMes);
+    }
+  }
+  return resultado;
+}
+
+proximoVencimientoFormateadoCliente(): string {
+  const cliente = this.clienteParaPago();
+  if (!cliente) return '—';
+  const efectiva = this.fechaEfectivaVencimiento(cliente);
+  if (!efectiva) return 'Sin registro previo';
+  return this.formatMesAnio(efectiva);
+}
+
+mesCubiertoHastaCliente(): string {
+  const cliente = this.clienteParaPago();
+  if (!cliente) return '—';
+  const acumulado = this.gridAcumuladoHastaCliente(cliente, this.anioGridCliente(), this.pagoAdelantadoCliente());
+  const seleccionados = acumulado.slice(0, this.mesesAPagarCliente());
+  if (seleccionados.length === 0) return '—';
+  return this.formatMesAnio(seleccionados[seleccionados.length - 1]);
+}
+
+cobrarAPartirDeCliente(): string {
+  const cliente = this.clienteParaPago();
+  if (!cliente) return '—';
+  const acumulado = this.gridAcumuladoHastaCliente(cliente, this.anioGridCliente(), this.pagoAdelantadoCliente());
+  const seleccionados = acumulado.slice(0, this.mesesAPagarCliente());
+  if (seleccionados.length === 0) return '—';
+  const ultimoMes = seleccionados[seleccionados.length - 1];
+  const proximo = new Date(ultimoMes.getFullYear(), ultimoMes.getMonth() + 2, 1);
+  return this.formatMesAnio(proximo);
+}
 
 }
