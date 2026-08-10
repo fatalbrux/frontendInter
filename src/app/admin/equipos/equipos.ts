@@ -126,7 +126,7 @@ quitarClienteEquipo(): void {
     this.formulario.pppoeUsuario = '';
   }
   this.clienteSeleccionadoEquipo.set(null);
-  this.formulario.clienteId = undefined;
+  this.formulario.clienteId = null as any;
   this.busquedaClienteEquipo.set('');
 
    // Al quitar el cliente, vuelve a Disponible (si no estaba en Mantenimiento/Dañado/Retirado)

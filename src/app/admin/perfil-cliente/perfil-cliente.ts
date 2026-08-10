@@ -74,13 +74,16 @@ this.equiposService.funListar().subscribe({
   error: (err) => console.error(err),
 });
 
-this.pagosService.funListar().subscribe({
+this.equiposService.funListar().subscribe({
   next: (res) => {
-    const pagosDelCliente = res.filter((p) => p.cliente?.id === id);
-    this.pagos.set(pagosDelCliente);
+    const equiposDelCliente = res.filter(
+      (e) => e.cliente?.id === id && e.estado === 'Instalado'
+    );
+    this.equipos.set(equiposDelCliente);
   },
   error: (err) => console.error(err),
 });
+
   }
 
   volver(): void {
