@@ -68,14 +68,6 @@ equipos = signal<Equipo[]>([]);
     // reemplaza este filtro en el front por la petición directa (más eficiente).
 this.equiposService.funListar().subscribe({
   next: (res) => {
-    const equiposDelCliente = res.filter((e) => e.cliente?.id === id);
-    this.equipos.set(equiposDelCliente);
-  },
-  error: (err) => console.error(err),
-});
-
-this.equiposService.funListar().subscribe({
-  next: (res) => {
     const equiposDelCliente = res.filter(
       (e) => e.cliente?.id === id && e.estado === 'Instalado'
     );
@@ -84,6 +76,13 @@ this.equiposService.funListar().subscribe({
   error: (err) => console.error(err),
 });
 
+this.pagosService.funListar().subscribe({
+  next: (res) => {
+    const pagosDelCliente = res.filter((p) => p.cliente?.id === id);
+    this.pagos.set(pagosDelCliente);
+  },
+  error: (err) => console.error(err),
+});
   }
 
   volver(): void {
