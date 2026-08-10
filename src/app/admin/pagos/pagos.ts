@@ -88,7 +88,7 @@ puedeRegistrarPago(cliente: Cliente | null): boolean {
 });
 
   fechaPago: string = this.formatearInputDate(new Date());
-  mesesAPagar = signal<number>(1);
+  mesesAPagar = signal<number>(0);
   metodoPago = signal<string>('Efectivo');
   notas = signal<string>('');
 
@@ -178,7 +178,7 @@ puedeRegistrarPago(cliente: Cliente | null): boolean {
     this.busquedaCi.set('');
     this.clienteSeleccionado.set(null);
     this.fechaPago = this.formatearInputDate(new Date());
-    this.mesesAPagar.set(1);
+    this.mesesAPagar.set(0);
     this.metodoPago.set('Efectivo');
     this.notas.set('');
     this.mostrarModal.set(true);
@@ -194,7 +194,7 @@ puedeRegistrarPago(cliente: Cliente | null): boolean {
   seleccionarCliente(cliente: Cliente): void {
     this.clienteSeleccionado.set(cliente);
     this.busquedaCi.set('');
-    this.mesesAPagar.set(1);
+    this.mesesAPagar.set(0);
     this.pagoAdelantado.set(false); // nuevo
     this.anioGrid.set(new Date().getFullYear());
   }

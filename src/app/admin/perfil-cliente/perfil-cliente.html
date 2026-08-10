@@ -157,49 +157,56 @@
       }
 
       <!-- TAB: Equipo Instalado -->
-      @if (tabActiva() === 'equipo') {
-        <div class="p-6">
-          @if (!equipo()) {
-            <p class="text-center text-gray-400 py-8">Este cliente no tiene un equipo asignado.</p>
-          } @else {
+<!-- TAB: Equipo Instalado -->
+@if (tabActiva() === 'equipo') {
+  <div class="p-6">
+    @if (equipos().length === 0) {
+      <p class="text-center text-gray-400 py-8">Este cliente no tiene equipos asignados.</p>
+    } @else {
+      <div class="space-y-6">
+        @for (eq of equipos(); track eq.id) {
+          <div class="pb-6 border-b border-gray-100 last:border-0 last:pb-0">
             <div class="flex items-center gap-3 mb-5">
               <div class="w-11 h-11 rounded-xl bg-gray-100 text-gray-500 flex items-center justify-center shrink-0">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25M21 5.25v9A2.25 2.25 0 0118.75 16.5H5.25A2.25 2.25 0 013 14.25v-9m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0v.75A2.25 2.25 0 0118.75 8.25H5.25A2.25 2.25 0 013 6v-.75"/></svg>
               </div>
               <div>
-                <p class="text-sm font-bold text-gray-800">{{ equipo()?.marca?.nombre }} {{ equipo()?.modelo }}</p>
-                <p class="text-xs text-gray-400">{{ equipo()?.codigo }}</p>
+                <p class="text-sm font-bold text-gray-800">{{ eq.marca?.nombre }} {{ eq.modelo }}</p>
+                <p class="text-xs text-gray-400">{{ eq.codigo }}</p>
               </div>
-              <span class="ml-auto inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold" [ngClass]="claseEstadoEquipo(equipo()!.estado)">
-                <span class="w-1.5 h-1.5 rounded-full bg-current"></span>{{ equipo()!.estado }}
+              <span class="ml-auto inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold" [ngClass]="claseEstadoEquipo(eq.estado)">
+                <span class="w-1.5 h-1.5 rounded-full bg-current"></span>{{ eq.estado }}
               </span>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5">
               <div>
                 <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Número de serie</p>
-                <p class="text-sm text-gray-800 mt-1 font-mono">{{ equipo()?.nroSerie || '—' }}</p>
+                <p class="text-sm text-gray-800 mt-1 font-mono">{{ eq.nroSerie || '—' }}</p>
               </div>
               <div>
                 <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Dirección MAC</p>
-                <p class="text-sm text-gray-800 mt-1 font-mono">{{ equipo()?.mac || '—' }}</p>
+                <p class="text-sm text-gray-800 mt-1 font-mono">{{ eq.mac || '—' }}</p>
               </div>
               <div>
                 <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Dirección IP</p>
-                <p class="text-sm text-gray-800 mt-1 font-mono">{{ equipo()?.ip || '—' }}</p>
+                <p class="text-sm text-gray-800 mt-1 font-mono">{{ eq.ip || '—' }}</p>
               </div>
               <div>
                 <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Usuario PPPoE</p>
-                <p class="text-sm text-gray-800 mt-1 font-mono">{{ equipo()?.pppoeUsuario || '—' }}</p>
+                <p class="text-sm text-gray-800 mt-1 font-mono">{{ eq.pppoeUsuario || '—' }}</p>
               </div>
               <div>
                 <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Contraseña PPPoE</p>
-                <p class="text-sm text-gray-800 mt-1 font-mono">{{ equipo()?.pppoePassword || '—' }}</p>
+                <p class="text-sm text-gray-800 mt-1 font-mono">{{ eq.pppoePassword || '—' }}</p>
               </div>
             </div>
-          }
-        </div>
-      }
+          </div>
+        }
+      </div>
+    }
+  </div>
+}
 
       <!-- TAB: Historial de Pagos -->
       @if (tabActiva() === 'pagos') {

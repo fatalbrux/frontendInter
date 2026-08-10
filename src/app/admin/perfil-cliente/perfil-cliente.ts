@@ -24,7 +24,7 @@ export class PerfilCliente implements OnInit {
   private readonly pagosService = inject(PagosService);
 
   cliente = signal<Cliente | null>(null);
-  equipo = signal<Equipo | null>(null);
+equipos = signal<Equipo[]>([]);
   pagos = signal<Pago[]>([]);
   cargando = signal<boolean>(true);
   tabActiva = signal<Tab>('general');
@@ -66,10 +66,10 @@ export class PerfilCliente implements OnInit {
 
     // TODO: cuando agregues GET /equipo?clienteId=X en el backend,
     // reemplaza este filtro en el front por la petición directa (más eficiente).
-    this.equiposService.funListar().subscribe({
+this.equiposService.funListar().subscribe({
   next: (res) => {
-    const equipoDelCliente = res.find((e) => e.cliente?.id === id) ?? null;
-    this.equipo.set(equipoDelCliente);
+    const equiposDelCliente = res.filter((e) => e.cliente?.id === id);
+    this.equipos.set(equiposDelCliente);
   },
   error: (err) => console.error(err),
 });

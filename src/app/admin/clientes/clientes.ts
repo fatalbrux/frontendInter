@@ -267,12 +267,12 @@ bancoSeleccionado = signal<BancoPago | null>(null);
 abrirModalPago(cli: Cliente): void {
   this.clienteParaPago.set(cli);
   this.bancoSeleccionado.set(null);
-  this.mesesAPagarCliente.set(1); // nuevo
+  this.mesesAPagarCliente.set(0); // nuevo
   this.pagoAdelantadoCliente.set(false); // nuevo
   this.formularioPago = {
     ...this.formularioPagoVacio(),
     clienteId: cli.id,
-    monto: Number(cli.plan?.precioMensual ?? 0),
+    monto: 0,
     fechaPago: new Date().toISOString().slice(0, 10),
   };
   this.mostrarModalPago.set(true);
