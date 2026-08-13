@@ -59,7 +59,7 @@ export class Planes implements OnInit {
     this.formulario = {
       nombre: plan.nombre,
       anchoBanda: plan.anchoBanda,
-      precioMensual: plan.precioMensual,
+    precioMensual: Number(plan.precioMensual),
       descripcion: plan.descripcion,
       estado: plan.estado
     };

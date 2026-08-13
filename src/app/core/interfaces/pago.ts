@@ -6,6 +6,8 @@ export interface ClienteResumenPago {
   nombres: string;
   apellidos: string;
   usuario?: string; // 👈 agregar
+  telefono?: string;
+
 
 }
 

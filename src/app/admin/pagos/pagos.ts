@@ -8,6 +8,8 @@ import { BancoPago, MetodoPago, Pago, PagoPayload } from '../../core/interfaces/
 import { Cliente } from '../../core/interfaces/cliente';
 import { Plan } from '../../core/interfaces/plan';
 import { NotificacionesService } from '../../core/services/notificaciones';
+import { ReciboService } from '../../core/services/recibo';
+
 interface MesPago {
   fecha: Date;
   label: string;
@@ -24,6 +26,7 @@ export class Pagos implements OnInit {
   private readonly notificaciones = inject(NotificacionesService);
   private readonly clientesService = inject(ClientesService);
   private readonly planesService = inject(PlanesService);
+  private readonly reciboService = inject(ReciboService);
   private parseFechaLocal(fecha: string | Date): Date {
   if (fecha instanceof Date) return fecha;
   const [y, m, d] = fecha.split('-').map(Number);
@@ -232,14 +235,29 @@ confirmarPago(): void {
   };
 
   this.pagosService.funGuardar(dato).subscribe({
-    next: () => {
-      this.mostrarModal.set(false);
-      this.listarPagos();
-      this.notificaciones.exito('Pago registrado exitosamente');
-      this.listarClientes();
-    },
-    error: (err) => console.error(err)
-  });
+  next: (pagoGuardado) => {
+    this.mostrarModal.set(false);
+    this.listarPagos();
+    this.notificaciones.exito('Pago registrado exitosamente');
+    this.listarClientes();
+
+  this.reciboService.generarRecibo({
+  nroRecibo: pagoGuardado.nroRecibo,
+  fechaPago: pagoGuardado.fechaPago,
+  monto: pagoGuardado.monto,
+  mesesPagados: pagoGuardado.mesesPagados,
+  metodoPago: pagoGuardado.metodoPago,
+  nombreCliente: `${cliente.nombres} ${cliente.apellidos}`,
+  usuarioCliente: cliente.usuario,
+  telefonoCliente: cliente.telefono,
+  proximoVencimiento: pagoGuardado.nuevoVencimiento,
+});
+  },
+  error: (err) => console.error(err)
+});
+
+
+
 }
 
   private calcularNuevoVencimiento(fechaBase: Date, meses: number): Date {
@@ -451,6 +469,9 @@ private formatMesAnio(fecha: Date): string {
   return texto.charAt(0).toUpperCase() + texto.slice(1);
 }
 
+
+
+
 mesCubiertoHasta = computed(() => {
   const cliente = this.clienteSeleccionado();
   if (!cliente) return '—';
@@ -473,5 +494,21 @@ cobrarAPartirDe = computed(() => {
   const proximo = new Date(ultimoMes.getFullYear(), ultimoMes.getMonth() + 2, 1);
   return this.formatMesAnio(proximo);
 });
+
+
+
+descargarRecibo(pago: Pago): void {
+  this.reciboService.generarRecibo({
+    nroRecibo: pago.nroRecibo,
+    fechaPago: pago.fechaPago,
+    monto: pago.monto,
+    mesesPagados: pago.mesesPagados,
+    metodoPago: pago.metodoPago,
+    nombreCliente: this.nombreClientePago(pago),
+    usuarioCliente: pago.cliente?.usuario,
+    telefonoCliente: pago.cliente?.telefono,
+    proximoVencimiento: pago.nuevoVencimiento,
+  });
+}
 
 }

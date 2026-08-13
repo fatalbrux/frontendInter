@@ -10,7 +10,8 @@ import { Cliente, ClientePayload, EstadoCliente } from '../../core/interfaces/cl
 import { Zona } from '../../core/interfaces/zona';
 import { Plan } from '../../core/interfaces/plan';
 import { PagoPayload, MetodoPago, BancoPago } from '../../core/interfaces/pago';
-
+import { ReciboService } from '../../core/services/recibo';
+import { NotificacionesService } from '../../core/services/notificaciones';
 
 interface MesPago {
   fecha: Date;
@@ -48,6 +49,8 @@ export class Clientes implements OnInit {
   private readonly zonasService = inject(ZonasService);
   private readonly planesService = inject(PlanesService);
   private readonly pagosService = inject(PagosService);
+  private readonly reciboService = inject(ReciboService);
+  private readonly notificaciones = inject(NotificacionesService);
 
 // LOGICA DE FECHAS DE VENCIMIENTO
   private fechaEfectivaVencimiento(cliente: Cliente): Date | null {
@@ -197,7 +200,10 @@ bancoSeleccionado = signal<BancoPago | null>(null);
       : this.clientesService.funGuardar(datoLimpio);
 
     peticion.subscribe({
-      next: () => this.reiniciarYRefrescar(),
+      next: () => {
+        this.reiniciarYRefrescar();
+        this.notificaciones.exito('Cliente guardado exitosamente');
+      },
       error: (err) => {
         console.error(err);
         this.errorMensaje.set(
@@ -322,18 +328,34 @@ guardarPago(): void {
     ...(this.formularioPago.metodoPago === 'Código QR' && { banco: this.bancoSeleccionado() ?? undefined }),
   };
 
-  this.pagosService.funGuardar(dato).subscribe({
-    next: () => {
-      this.guardandoPago.set(false);
-      this.cerrarModalPago();
-      this.listar();
-    },
+ this.pagosService.funGuardar(dato).subscribe({
+  next: (pagoGuardado) => {
+    this.guardandoPago.set(false);
+    this.notificaciones.exito('Pago registrado exitosamente');
+    this.cerrarModalPago();
+    this.listar();
+
+    this.reciboService.generarRecibo({
+  nroRecibo: pagoGuardado.nroRecibo,
+  fechaPago: pagoGuardado.fechaPago,
+  monto: pagoGuardado.monto,
+  mesesPagados: pagoGuardado.mesesPagados,
+  metodoPago: pagoGuardado.metodoPago,
+  nombreCliente: `${cli.nombres} ${cli.apellidos}`,
+  usuarioCliente: cli.usuario,
+  telefonoCliente: cli.telefono,
+  proximoVencimiento: nuevoVencimiento,
+});
+  },
     error: (err) => {
       console.error(err);
       this.errorMensaje.set(err?.error?.message ?? 'Ocurrió un error al registrar el pago.');
       this.guardandoPago.set(false);
     },
   });
+
+
+  
 }
 private calcularNuevoVencimiento(fechaBase: Date, meses: number): Date {
   const nueva = new Date(fechaBase);
