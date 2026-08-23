@@ -202,6 +202,8 @@ quitarClienteEquipo(): void {
   }
 
   guardar(): void {
+    if (!this.formulario.mac) this.formulario.mac = undefined;
+    if (!this.formulario.ip) this.formulario.ip = undefined;
     if (this.modoEdicion() && this.idSeleccionado() !== null) {
       this.equiposService.funEditar(this.formulario, this.idSeleccionado()!).subscribe({
         next: () => {
