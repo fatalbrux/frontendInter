@@ -12,6 +12,7 @@ import { Reportes } from './admin/reportes/reportes';
 import { Morosos } from './admin/morosos/morosos';
 import { Login } from './auth/login/login';
 import { authGuard } from './core/guards/auth-guard';
+import { Configuraciones } from './admin/configuraciones/configuraciones';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -32,6 +33,7 @@ export const routes: Routes = [
       { path: 'dashboard', component: Dashboard, data: { title: 'Dashboard' } },
       { path: 'reportes', component: Reportes, data: { title: 'Reportes' } },
       { path: 'morosos', component: Morosos, data: { title: 'Morosos' } },
+      { path: 'configuraciones', component: Configuraciones, data: { title: 'Configuración' } },
     ]
   },
   { path: '**', redirectTo: 'login' }

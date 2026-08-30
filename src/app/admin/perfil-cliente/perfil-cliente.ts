@@ -7,13 +7,14 @@ import { PagosService } from '../../core/services/pagos';
 import { Cliente } from '../../core/interfaces/cliente';
 import { Equipo } from '../../core/interfaces/equipo';
 import { Pago } from '../../core/interfaces/pago';
+import { MapaUbicacion } from '../../admin/mapa-ubicacion/mapa-ubicacion';
 
 type Tab = 'general' | 'equipo' | 'pagos';
 
 @Component({
   selector: 'app-perfil-cliente',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, MapaUbicacion],
   templateUrl: './perfil-cliente.html',
 })
 export class PerfilCliente implements OnInit {
@@ -115,4 +116,76 @@ this.pagosService.funListar().subscribe({
   iniciales(cli: Cliente): string {
     return `${cli.nombres?.[0] ?? ''}${cli.apellidos?.[0] ?? ''}`.toUpperCase();
   }
+
+  //CODIGO PARA TARJETA DE MESES PENDIENTES
+
+private parseFechaLocal(fecha: string | Date): Date {
+  if (fecha instanceof Date) return fecha;
+  const [y, m, d] = fecha.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+
+private fechaEfectivaVencimiento(cliente: Cliente): Date | null {
+  if (cliente.proximoVencimiento) return this.parseFechaLocal(cliente.proximoVencimiento);
+  const base = cliente.fechaPrimerPago ?? cliente.fechaInstalacion;
+  if (!base) return null;
+  const fecha = this.parseFechaLocal(base);
+  fecha.setMonth(fecha.getMonth() + 2);
+  fecha.setDate(1);
+  return fecha;
+}
+
+mesesPendientes = computed(() => {
+  const cli = this.cliente();
+  if (!cli) return 0;
+  const efectiva = this.fechaEfectivaVencimiento(cli);
+  if (!efectiva) return 0;
+  const hoy = new Date();
+  const totalHoy = hoy.getFullYear() * 12 + hoy.getMonth();
+  const totalEfectiva = efectiva.getFullYear() * 12 + efectiva.getMonth();
+  return Math.max(totalHoy - totalEfectiva + 1, 0);
+});
+
+
+
+  //CODIGO QUE ES PARA EL MAPA
+
+latPendiente = signal<number | null>(null);
+lngPendiente = signal<number | null>(null);
+guardandoUbicacion = signal<boolean>(false);
+
+ubicacionModificada = computed(() => {
+  const cli = this.cliente();
+  const lat = this.latPendiente();
+  const lng = this.lngPendiente();
+  if (!cli || lat === null || lng === null) return false;
+  return lat !== cli.latitud || lng !== cli.longitud;
+});
+
+onUbicacionCambiada(evento: { latitud: number; longitud: number }): void {
+  this.latPendiente.set(evento.latitud);
+  this.lngPendiente.set(evento.longitud);
+}
+
+guardarUbicacion(): void {
+  const cli = this.cliente();
+  const lat = this.latPendiente();
+  const lng = this.lngPendiente();
+  if (!cli || lat === null || lng === null) return;
+
+  this.guardandoUbicacion.set(true);
+  this.clientesService.funEditar({ latitud: lat, longitud: lng }, cli.id).subscribe({
+    next: () => {
+      this.cliente.update((actual) => actual ? { ...actual, latitud: lat, longitud: lng } : actual);
+      this.latPendiente.set(null);
+      this.lngPendiente.set(null);
+      this.guardandoUbicacion.set(false);
+    },
+    error: (err) => {
+      console.error(err);
+      this.guardandoUbicacion.set(false);
+    },
+  });
+}
+
 }

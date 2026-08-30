@@ -1,0 +1,303 @@
+<div class="p-6">
+  <h1 class="text-lg font-bold text-gray-800 mb-1">Configuración</h1>
+  <p class="text-xs text-gray-400 mb-6">Administra tu cuenta y las opciones del sistema</p>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <!-- ====== COLUMNA PRINCIPAL (2/3) ====== -->
+    <div class="lg:col-span-2">
+
+      <!-- TABS -->
+      <div class="flex gap-2 border-b border-gray-200 mb-6 overflow-x-auto">
+        <button (click)="cambiarTab('perfil')"
+          class="px-4 py-2 text-xs font-semibold border-b-2 transition-colors whitespace-nowrap"
+          [ngClass]="tabActiva() === 'perfil' ? 'border-red-600 text-red-600' : 'border-transparent text-gray-400 hover:text-gray-600'">
+          Mi Perfil
+        </button>
+        <button (click)="cambiarTab('empresa')"
+          class="px-4 py-2 text-xs font-semibold border-b-2 transition-colors whitespace-nowrap"
+          [ngClass]="tabActiva() === 'empresa' ? 'border-red-600 text-red-600' : 'border-transparent text-gray-400 hover:text-gray-600'">
+          Datos de la Empresa
+        </button>
+        <button (click)="cambiarTab('bancos')"
+          class="px-4 py-2 text-xs font-semibold border-b-2 transition-colors whitespace-nowrap"
+          [ngClass]="tabActiva() === 'bancos' ? 'border-red-600 text-red-600' : 'border-transparent text-gray-400 hover:text-gray-600'">
+          Bancos / Billeteras
+        </button>
+        <button (click)="cambiarTab('backup')"
+          class="px-4 py-2 text-xs font-semibold border-b-2 transition-colors whitespace-nowrap"
+          [ngClass]="tabActiva() === 'backup' ? 'border-red-600 text-red-600' : 'border-transparent text-gray-400 hover:text-gray-600'">
+          Respaldo de datos
+        </button>
+      </div>
+
+      <!-- ====== TAB: PERFIL ====== -->
+      <div *ngIf="tabActiva() === 'perfil'" class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+        <p class="text-xs font-bold text-red-600 uppercase tracking-wider mb-4">Datos de mi cuenta</p>
+
+        <div *ngIf="usuario() as u">
+          <div class="flex items-center gap-4 mb-6">
+            <div class="w-14 h-14 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-lg font-bold">
+              {{ (u.nombreCompleto || u.email)[0] | uppercase }}
+            </div>
+            <div>
+              <p class="text-sm font-bold text-gray-800">{{ u.nombreCompleto || 'Usuario' }}</p>
+              <p class="text-xs text-gray-400">{{ u.rol || 'Sin rol asignado' }}</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Correo electrónico</p>
+              <div class="px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-700">{{ u.email }}</div>
+            </div>
+            <div>
+              <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">ID de usuario</p>
+              <div class="px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-700">{{ u.id }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="!usuario()" class="text-xs text-gray-400">
+          No se pudo cargar la información del usuario.
+        </div>
+      </div>
+
+      <!-- ====== TAB: DATOS DE LA EMPRESA ====== -->
+      <div *ngIf="tabActiva() === 'empresa'" class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+          <p class="text-xs font-bold text-red-600 uppercase tracking-wider">Datos de la empresa</p>
+          <span *ngIf="guardadoExitoso()" class="text-[11px] font-semibold text-emerald-600">✓ Guardado</span>
+        </div>
+
+        <p class="text-[11px] text-gray-400 mb-5">
+          Esta información se guarda localmente en este equipo por ahora.
+        </p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Nombre de la empresa</label>
+            <input type="text" [ngModel]="datosEmpresa().nombre"
+              (ngModelChange)="actualizarCampoEmpresa('nombre', $event)"
+              placeholder="Ej: Mi Empresa SRL"
+              class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500" />
+          </div>
+
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Dirección</label>
+            <input type="text" [ngModel]="datosEmpresa().direccion"
+              (ngModelChange)="actualizarCampoEmpresa('direccion', $event)"
+              placeholder="Av. Principal #100, Ciudad"
+              class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Teléfono 1</label>
+            <input type="text" [ngModel]="datosEmpresa().telefono1"
+              (ngModelChange)="actualizarCampoEmpresa('telefono1', $event)"
+              placeholder="71234567"
+              class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Teléfono 2</label>
+            <input type="text" [ngModel]="datosEmpresa().telefono2"
+              (ngModelChange)="actualizarCampoEmpresa('telefono2', $event)"
+              placeholder="68765432"
+              class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500" />
+          </div>
+
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Correo electrónico</label>
+            <input type="email" [ngModel]="datosEmpresa().email"
+              (ngModelChange)="actualizarCampoEmpresa('email', $event)"
+              placeholder="contacto@miempresa.com"
+              class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500" />
+          </div>
+        </div>
+
+        <!-- Logo -->
+        <div class="mb-5">
+          <label class="block text-xs font-semibold text-gray-600 mb-2">Logo del sistema</label>
+          <div class="flex items-center gap-4">
+            <div class="w-16 h-16 rounded-xl bg-red-50 border border-red-100 flex items-center justify-center overflow-hidden">
+              <img *ngIf="datosEmpresa().logoUrl" [src]="datosEmpresa().logoUrl" class="w-full h-full object-cover" alt="Logo" />
+              <span *ngIf="!datosEmpresa().logoUrl" class="text-red-300 text-[10px] text-center px-1">Sin logo</span>
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-[11px] font-semibold text-red-600 cursor-pointer hover:underline">
+                Subir logo
+                <input type="file" accept="image/png, image/jpeg" class="hidden" (change)="onLogoSeleccionado($event)" />
+              </label>
+              <button *ngIf="datosEmpresa().logoUrl" (click)="quitarLogo()" class="text-[11px] text-gray-400 hover:text-red-500 text-left">
+                Quitar logo
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-end">
+          <button (click)="guardarDatosEmpresa()"
+            class="px-5 py-2 text-xs font-semibold text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-sm transition-colors">
+            Guardar cambios
+          </button>
+        </div>
+      </div>
+
+      <!-- ====== TAB: BANCOS (placeholder) ====== -->
+      <div *ngIf="tabActiva() === 'bancos'" class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+        <p class="text-xs font-bold text-red-600 uppercase tracking-wider mb-4">Bancos / Billeteras para pagos QR</p>
+        <div class="border border-dashed border-gray-200 rounded-xl p-8 text-center">
+          <p class="text-xs text-gray-400">Próximamente: agrega, edita o desactiva los bancos disponibles para cobrar con QR.</p>
+        </div>
+      </div>
+
+     <!-- ====== TAB: BACKUP ====== -->
+<div *ngIf="tabActiva() === 'backup'" class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+    <p class="text-xs font-bold text-red-600 uppercase tracking-wider">Respaldo de la base de datos</p>
+    <div class="flex items-center gap-2">
+      <label
+        [class.opacity-50]="restaurandoArchivo()"
+        [class.pointer-events-none]="restaurandoArchivo()"
+        class="px-4 py-2 text-xs font-semibold text-red-600 border border-red-200 hover:bg-red-50 rounded-xl transition-colors cursor-pointer"
+      >
+        {{ restaurandoArchivo() ? 'Restaurando...' : 'Subir backup y restaurar' }}
+        <input type="file" accept=".json,application/json" class="hidden" (change)="onArchivoSeleccionado($event)" />
+      </label>
+ 
+      <button (click)="generarBackup()" [disabled]="generandoBackup()"
+        class="px-4 py-2 text-xs font-semibold text-white bg-red-600 hover:bg-red-700 disabled:bg-red-300 rounded-xl shadow-sm transition-colors">
+        {{ generandoBackup() ? 'Generando...' : 'Crear backup' }}
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="mensajeBackup()" class="mb-4 rounded-xl bg-emerald-50 text-emerald-700 px-4 py-2 text-xs font-semibold">
+    {{ mensajeBackup() }}
+  </div>
+  <div *ngIf="errorBackup()" class="mb-4 rounded-xl bg-red-50 text-red-600 px-4 py-2 text-xs font-semibold">
+    {{ errorBackup() }}
+  </div>
+
+  <div *ngIf="cargandoBackups()" class="text-xs text-gray-400">Cargando backups...</div>
+
+  <div *ngIf="!cargandoBackups() && backups().length === 0" class="border border-dashed border-gray-200 rounded-xl p-8 text-center">
+    <p class="text-xs text-gray-400">Todavía no hay backups generados.</p>
+  </div>
+
+  <div *ngIf="!cargandoBackups() && backups().length > 0" class="overflow-hidden rounded-xl border border-gray-200">
+    <div class="flex items-center justify-between mb-6 bg-gray-50 border border-gray-100 rounded-xl p-4">
+  <div class="flex items-center gap-4">
+    <label class="flex items-center gap-2 cursor-pointer">
+      <input type="checkbox" [ngModel]="configBackup().activado" (ngModelChange)="actualizarActivadoBackup($event)" class="w-4 h-4 accent-red-600" />
+      <span class="text-xs font-semibold text-gray-700">Backup automático</span>
+    </label>
+    <select [ngModel]="configBackup().frecuencia" (ngModelChange)="actualizarFrecuenciaBackup($event)"
+      [disabled]="!configBackup().activado" class="text-xs border border-gray-200 rounded-lg px-2 py-1.5 bg-white disabled:opacity-50">
+      <option value="diario">Diario</option>
+      <option value="semanal">Semanal</option>
+      <option value="mensual">Mensual</option>
+    </select>
+  </div>
+  <button (click)="guardarConfigBackup()" [disabled]="guardandoConfigBackup()" class="px-4 py-1.5 text-xs font-semibold text-white bg-red-600 hover:bg-red-700 disabled:bg-red-300 rounded-lg">
+    {{ guardandoConfigBackup() ? 'Guardando...' : 'Guardar' }}
+  </button>
+</div>
+    <table class="w-full text-xs text-left">
+      <thead class="bg-gray-50 text-gray-500">
+        <tr>
+          <th class="px-4 py-2 font-semibold">Archivo</th>
+          <th class="px-4 py-2 font-semibold">Fecha</th>
+          <th class="px-4 py-2 font-semibold">Tamaño</th>
+          <th class="px-4 py-2 font-semibold text-right">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let backup of backups()" class="border-t border-gray-100">
+          <td class="px-4 py-2 font-mono text-gray-700">{{ backup.nombre }}</td>
+          <td class="px-4 py-2 text-gray-500">{{ backup.fecha | date: 'dd/MM/yyyy HH:mm' }}</td>
+          <td class="px-4 py-2 text-gray-500">{{ backup.tamanoKB }} KB</td>
+          <td class="px-4 py-2 text-right">
+            <div class="flex items-center justify-end gap-2">
+              <button
+                (click)="descargarBackup(backup)"
+                title="Descargar"
+                class="p-1.5 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 3v12" />
+                  <path d="M7 10l5 5 5-5" />
+                  <path d="M5 21h14" />
+                </svg>
+              </button>
+
+              <button
+                (click)="pedirConfirmacionRestaurar(backup)"
+                [disabled]="restaurandoRuta() === backup.ruta"
+                [title]="restaurandoRuta() === backup.ruta ? 'Restaurando...' : 'Restaurar'"
+                class="p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <svg *ngIf="restaurandoRuta() !== backup.ruta" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 12a9 9 0 1 0 3-6.7" />
+                  <path d="M3 4v5h5" />
+                </svg>
+                <svg *ngIf="restaurandoRuta() === backup.ruta" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 12a9 9 0 1 0 3-6.7" />
+                  <path d="M3 4v5h5" />
+                </svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+    </div>
+
+    <!-- ====== SIDEBAR (1/3) ====== -->
+    <div class="space-y-6">
+      <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+        <p class="text-xs font-bold text-red-600 uppercase tracking-wider mb-4">Información del sistema</p>
+        <div class="space-y-3">
+          <div class="flex justify-between items-center">
+            <span class="text-xs text-gray-500">Versión</span>
+            <span class="text-xs font-semibold text-gray-800">{{ versionSistema }}</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-xs text-gray-500">Usuario</span>
+            <span class="text-xs font-semibold text-gray-800">{{ usuario()?.nombreCompleto || '—' }}</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-xs text-gray-500">Rol</span>
+            <span class="text-xs font-semibold text-gray-800">{{ usuario()?.rol || '—' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+@if (mostrarConfirmarRestaurarBackup()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
+      <div class="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mx-auto mb-4">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+        </svg>
+      </div>
+      <h3 class="text-base font-bold text-gray-800 mb-2">¿Confirmar restauración?</h3>
+      <p class="text-xs text-gray-500 mb-6">
+        Vas a restaurar <span class="font-semibold text-gray-700">{{ backupParaRestaurar()?.nombre || archivoParaRestaurar()?.name }}</span>.
+        Esto reemplazará TODOS los datos actuales y no se puede deshacer.
+      </p>
+      <div class="flex items-center justify-center gap-3">
+        <button (click)="cancelarRestaurarBackup()" class="w-full py-2.5 text-xs font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl">Cancelar</button>
+        <button (click)="confirmarRestaurarBackupReal()" class="w-full py-2.5 text-xs font-semibold text-white bg-red-600 hover:bg-red-700 rounded-xl">Sí, restaurar</button>
+      </div>
+    </div>
+  </div>
+}
