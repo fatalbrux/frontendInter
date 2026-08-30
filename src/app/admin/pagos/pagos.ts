@@ -59,8 +59,9 @@ puedeRegistrarPago(cliente: Cliente | null): boolean {
   // ================= FILTROS TABLA =================
   busquedaTabla = signal<string>('');
   filtroMetodo = signal<string>('Todos');
+  filtroPeriodo = signal<string>('Todos');
 
-  pagosFiltrados = computed(() => {
+  /*pagosFiltrados = computed(() => {
   const texto = this.busquedaTabla().toLowerCase().trim();
   const metodo = this.filtroMetodo();
   return this.listaPagos().filter(pago => {
@@ -68,6 +69,31 @@ puedeRegistrarPago(cliente: Cliente | null): boolean {
     const coincideTexto = !texto || nombre.includes(texto) || pago.nroRecibo.toLowerCase().includes(texto);
     const coincideMetodo = metodo === 'Todos' || pago.metodoPago === metodo;
     return coincideTexto && coincideMetodo;
+  });
+});*/
+pagosFiltrados = computed(() => {
+  const texto = this.busquedaTabla().toLowerCase().trim();
+  const metodo = this.filtroMetodo();
+  const periodo = this.filtroPeriodo();
+  const hoy = new Date();
+
+  return this.listaPagos().filter(pago => {
+    const nombre = this.nombreClientePago(pago).toLowerCase();
+    const coincideTexto = !texto || nombre.includes(texto) || pago.nroRecibo.toLowerCase().includes(texto);
+    const coincideMetodo = metodo === 'Todos' || pago.metodoPago === metodo;
+
+    const fechaPago = this.parseFechaLocal(pago.fechaPago);
+    let coincidePeriodo = true;
+    if (periodo === 'Hoy') {
+      coincidePeriodo = fechaPago.toDateString() === hoy.toDateString();
+    } else if (periodo === 'Este mes') {
+      coincidePeriodo = fechaPago.getMonth() === hoy.getMonth() && fechaPago.getFullYear() === hoy.getFullYear();
+    } else if (periodo === 'Mes anterior') {
+      const mesAnterior = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1);
+      coincidePeriodo = fechaPago.getMonth() === mesAnterior.getMonth() && fechaPago.getFullYear() === mesAnterior.getFullYear();
+    }
+
+    return coincideTexto && coincideMetodo && coincidePeriodo;
   });
 });
 
@@ -159,22 +185,31 @@ puedeRegistrarPago(cliente: Cliente | null): boolean {
   return pago.cliente?.usuario ?? '—';
   }
 
-  totalIngresosMes(): number {
-    const hoy = new Date();
-    return this.listaPagos()
-      .filter(p => {
-        const f = new Date(p.fechaPago);
-        return f.getMonth() === hoy.getMonth() && f.getFullYear() === hoy.getFullYear();
-      })
-      .reduce((acum, p) => acum + Number(p.monto), 0);
-  }
+totalIngresosMes(): number {
+  const hoy = new Date();
+  return this.listaPagos()
+    .filter(p => {
+      const f = this.parseFechaLocal(p.fechaPago);
+      return f.getMonth() === hoy.getMonth() && f.getFullYear() === hoy.getFullYear();
+    })
+    .reduce((acum, p) => acum + Number(p.monto), 0);
+}
 
-  cobrosHoy(): number {
-    const hoy = new Date().toDateString();
-    return this.listaPagos()
-      .filter(p => new Date(p.fechaPago).toDateString() === hoy)
-      .reduce((acum, p) => acum + Number(p.monto), 0);
-  }
+pagosDelMes = computed(() => {
+  const hoy = new Date();
+  return this.listaPagos().filter(p => {
+    const f = this.parseFechaLocal(p.fechaPago);
+    return f.getMonth() === hoy.getMonth() && f.getFullYear() === hoy.getFullYear();
+  }).length;
+});
+
+
+cobrosHoy(): number {
+  const hoy = new Date().toDateString();
+  return this.listaPagos()
+    .filter(p => this.parseFechaLocal(p.fechaPago).toDateString() === hoy)
+    .reduce((acum, p) => acum + Number(p.monto), 0);
+}
 
   // ================= MODAL =================
   abrirModal(): void {

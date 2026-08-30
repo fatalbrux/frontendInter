@@ -28,6 +28,8 @@ export interface Cliente {
   creadoEn: Date;
   zona: ZonaResumen;
   plan: PlanResumen;
+  latitud: number | null;
+  longitud: number | null;
 }
 
 export type EstadoCliente = 'Activo' | 'Suspendido' | 'Corte de servicio';
