@@ -1,79 +1,164 @@
-<div class="min-h-screen w-full flex flex-col items-center justify-center relative overflow-hidden font-sans"
-     style="background: linear-gradient(135deg, #8b1a1a 0%, #b91c1c 50%, #7f1d1d 100%);">
+<div class="min-h-screen w-full flex font-sans bg-[#fafaf9]">
 
-  <!-- Círculos decorativos de fondo -->
-  <div class="absolute -top-32 -right-20 w-96 h-96 bg-white/10 rounded-full"></div>
-  <div class="absolute -bottom-24 -left-24 w-72 h-72 bg-black/10 rounded-full"></div>
+  <!-- ====== PANEL IZQUIERDO — marca + ilustración de red ====== -->
+  <div class="hidden lg:flex lg:w-[60%] relative overflow-hidden flex-col justify-between px-12 py-12"
+       style="background: radial-gradient(120% 120% at 15% 10%, #7f1d1d 0%, #4a0e0e 45%, #1a0505 100%);">
 
-  <!-- Card de Login -->
-  <div class="relative z-10 bg-white rounded-2xl shadow-2xl w-full max-w-sm px-9 py-10 text-center">
+    <!-- Ilustración: nodos de red conectados -->
+    <svg class="absolute inset-0 w-full h-full opacity-90" viewBox="0 0 600 800" fill="none" preserveAspectRatio="xMidYMid slice">
+      <!-- líneas de conexión -->
+      <g stroke="#f87171" stroke-opacity="0.25" stroke-width="1.5">
+        <line x1="90" y1="180" x2="260" y2="120" />
+        <line x1="260" y1="120" x2="420" y2="220" />
+        <line x1="260" y1="120" x2="180" y2="320" />
+        <line x1="420" y1="220" x2="500" y2="380" />
+        <line x1="180" y1="320" x2="80" y2="460" />
+        <line x1="180" y1="320" x2="340" y2="410" />
+        <line x1="340" y1="410" x2="500" y2="380" />
+        <line x1="340" y1="410" x2="300" y2="560" />
+        <line x1="80" y1="460" x2="150" y2="620" />
+        <line x1="300" y1="560" x2="150" y2="620" />
+        <line x1="300" y1="560" x2="460" y2="640" />
+        <line x1="460" y1="640" x2="500" y2="380" />
+      </g>
+      <!-- nodos -->
+      <g fill="#fca5a5">
+        <circle cx="90" cy="180" r="4" />
+        <circle cx="420" cy="220" r="4" />
+        <circle cx="80" cy="460" r="4" />
+        <circle cx="150" cy="620" r="4" />
+        <circle cx="460" cy="640" r="4" />
+      </g>
+      <!-- nodos "activos" -->
+      <g fill="#ffffff">
+        <circle cx="260" cy="120" r="6" />
+        <circle cx="260" cy="120" r="6" class="animate-ping" opacity="0.4" />
+        <circle cx="180" cy="320" r="6" />
+        <circle cx="340" cy="410" r="6" />
+        <circle cx="340" cy="410" r="6" class="animate-ping" opacity="0.4" style="animation-delay: 0.6s" />
+        <circle cx="500" cy="380" r="6" />
+        <circle cx="300" cy="560" r="6" />
+      </g>
+    </svg>
 
-    <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-red-600 to-red-900 text-white font-bold text-xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-      SC
+    <div class="relative z-10 flex items-center gap-2.5">
+      <div class="w-9 h-9 rounded-lg bg-white/10 border border-white/20 backdrop-blur-sm text-white font-bold text-sm flex items-center justify-center">
+        SC
+      </div>
+      <span class="text-white/90 text-sm font-semibold tracking-wide">SetcomIT</span>
     </div>
 
-    <h1 class="text-xl font-bold text-gray-900 mb-1">SetcomIT</h1>
-    <p class="text-xs text-gray-500 mb-7">Sistema de Gestión de Clientes y Cobros</p>
+    <div class="relative z-10 max-w-sm">
+      <h1 class="text-white text-4xl font-bold leading-[1.1] tracking-tight mb-4">
+        Tu red, tus clientes, todo conectado.
+      </h1>
+      <p class="text-white/60 text-sm leading-relaxed">
+        Gestiona clientes, cobros, equipos y zonas de cobertura desde un solo panel, pensado para proveedores de internet.
+      </p>
+    </div>
 
-    <form (ngSubmit)="onSubmit()" novalidate class="text-left">
-
-      <div class="mb-4">
-        <label for="usuario" class="block text-xs font-semibold text-gray-700 mb-1.5">Usuario</label>
-        <input
-          id="usuario"
-          type="text"
-          name="usuario"
-          placeholder="admin"
-          [(ngModel)]="usuario"
-          [disabled]="cargando()"
-          autocomplete="username"
-          class="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all disabled:opacity-60"
-        />
-      </div>
-
-      <div class="mb-5">
-        <label for="password" class="block text-xs font-semibold text-gray-700 mb-1.5">Contraseña</label>
-        <div class="relative">
-          <input
-            id="password"
-            [type]="mostrarPassword() ? 'text' : 'password'"
-            name="password"
-            placeholder="••••••••"
-            [(ngModel)]="password"
-            [disabled]="cargando()"
-            autocomplete="current-password"
-            class="w-full px-3.5 py-2.5 pr-10 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all disabled:opacity-60"
-          />
-          <button
-            type="button"
-            (click)="togglePassword()"
-            class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-gray-400 hover:text-gray-600"
-            [attr.aria-label]="mostrarPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
-          >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/>
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      @if (errorMsg()) {
-        <div class="mb-4 rounded-xl bg-red-50 border border-red-200 px-3.5 py-2.5 text-xs font-medium text-red-700">
-          {{ errorMsg() }}
-        </div>
-      }
-
-      <button
-        type="submit"
-        [disabled]="cargando()"
-        class="w-full bg-red-700 hover:bg-red-800 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-semibold py-2.5 rounded-xl shadow-md transition-colors"
-      >
-        {{ cargando() ? 'Ingresando...' : 'Iniciar sesión' }}
-      </button>
-
-    </form>
+    <p class="relative z-10 text-white/40 text-xs">© 2026 SetcomIT · Todos los derechos reservados</p>
   </div>
 
-  <p class="relative z-10 text-white/70 text-xs mt-6">© 2026 SetcomIT · Todos los derechos reservados</p>
+  <!-- ====== PANEL DERECHO — formulario ====== -->
+  <div class="flex-1 relative flex items-center justify-center px-6 py-12 overflow-hidden bg-[#f6f3f2]">
+
+    <!-- continuación de la red: unas líneas "cruzan" desde el panel oscuro, atándose visualmente -->
+    <svg class="absolute top-0 left-0 w-full h-72 opacity-[0.18] pointer-events-none" viewBox="0 0 800 300" fill="none" preserveAspectRatio="none">
+      <g stroke="#b91c1c" stroke-width="1.5">
+        <line x1="-20" y1="40" x2="180" y2="110" />
+        <line x1="180" y1="110" x2="360" y2="30" />
+        <line x1="180" y1="110" x2="300" y2="220" />
+      </g>
+      <g fill="#7f1d1d">
+        <circle cx="180" cy="110" r="4" />
+        <circle cx="360" cy="30" r="3" />
+        <circle cx="300" cy="220" r="3" />
+      </g>
+    </svg>
+
+    <!-- resplandor cálido, más presente que antes -->
+    <div class="absolute -top-16 -right-16 w-[28rem] h-[28rem] rounded-full bg-red-100/70 blur-2xl pointer-events-none"></div>
+    <div class="absolute bottom-0 left-0 w-72 h-72 rounded-full bg-red-50 blur-3xl opacity-80 pointer-events-none"></div>
+
+    <!-- patrón de puntos, más visible que antes -->
+    <div class="absolute inset-0 pointer-events-none opacity-60"
+         style="background-image: radial-gradient(#e3ddda 1.5px, transparent 1.5px); background-size: 26px 26px; mask-image: radial-gradient(ellipse 65% 55% at 50% 45%, transparent 35%, black 100%);"></div>
+
+    <div class="relative z-10 w-full max-w-sm bg-white rounded-2xl shadow-xl shadow-black/[0.04] border border-gray-100 px-8 py-9">
+
+      <!-- logo visible solo en mobile, donde el panel izquierdo se oculta -->
+      <div class="lg:hidden flex items-center gap-2.5 mb-10">
+        <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-red-600 to-red-900 text-white font-bold text-sm flex items-center justify-center">
+          SC
+        </div>
+        <span class="text-gray-800 text-sm font-semibold tracking-wide">SetcomIT</span>
+      </div>
+
+      <h2 class="text-2xl font-bold text-gray-900 tracking-tight mb-1.5">Bienvenido de nuevo</h2>
+      <p class="text-sm text-gray-500 mb-8">Ingresa a tu panel de gestión</p>
+
+      <form (ngSubmit)="onSubmit()" novalidate>
+
+        <div class="mb-4">
+          <label for="usuario" class="block text-xs font-semibold text-gray-700 mb-1.5">Usuario</label>
+          <input
+            id="usuario"
+            type="text"
+            name="usuario"
+            placeholder="admin"
+            [(ngModel)]="usuario"
+            [disabled]="cargando()"
+            autocomplete="username"
+            class="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all disabled:opacity-60"
+          />
+        </div>
+
+        <div class="mb-2">
+          <label for="password" class="block text-xs font-semibold text-gray-700 mb-1.5">Contraseña</label>
+          <div class="relative">
+            <input
+              id="password"
+              [type]="mostrarPassword() ? 'text' : 'password'"
+              name="password"
+              placeholder="••••••••"
+              [(ngModel)]="password"
+              [disabled]="cargando()"
+              autocomplete="current-password"
+              class="w-full px-3.5 py-2.5 pr-10 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all disabled:opacity-60"
+            />
+            <button
+              type="button"
+              (click)="togglePassword()"
+              class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-gray-400 hover:text-gray-600"
+              [attr.aria-label]="mostrarPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        @if (errorMsg()) {
+          <div class="mb-4 mt-3 rounded-xl bg-red-50 border border-red-200 px-3.5 py-2.5 text-xs font-medium text-red-700">
+            {{ errorMsg() }}
+          </div>
+        }
+
+        <button
+          type="submit"
+          [disabled]="cargando()"
+          class="w-full mt-6 bg-red-700 hover:bg-red-800 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-semibold py-2.5 rounded-xl shadow-md shadow-red-900/10 transition-colors"
+        >
+          {{ cargando() ? 'Ingresando...' : 'Iniciar sesión' }}
+        </button>
+
+      </form>
+
+      <p class="lg:hidden text-center text-gray-400 text-xs mt-10">© 2026 SetcomIT</p>
+    </div>
+  </div>
+
 </div>

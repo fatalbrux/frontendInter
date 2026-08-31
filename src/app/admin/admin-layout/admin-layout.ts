@@ -8,6 +8,7 @@ import { filter, map } from 'rxjs/operators';
 import { OnInit } from '@angular/core';
 import { DashboardService } from '../../core/services/dashboard';
 import { AuthService } from '../../core/services/auth';
+import { toastSlide } from '../../core/animations';
 
 interface MenuItem {
   label: string;
@@ -40,6 +41,7 @@ const ICONS = {
   imports: [RouterOutlet, RouterLink, RouterLinkActive, CommonModule], // <-- agregué RouterLink y RouterLinkActive, se usan en el HTML
   templateUrl: './admin-layout.html',
   styleUrl: './admin-layout.css',
+  animations: [toastSlide],
 })
 export class AdminLayout implements OnInit{
   private readonly dashboardService = inject(DashboardService);
