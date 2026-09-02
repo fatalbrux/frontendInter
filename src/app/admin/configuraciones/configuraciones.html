@@ -32,7 +32,7 @@
       </div>
 
       <!-- ====== TAB: PERFIL ====== -->
-      <div *ngIf="tabActiva() === 'perfil'" class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+      <div *ngIf="tabActiva() === 'perfil'" @tabContent class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
         <p class="text-xs font-bold text-red-600 uppercase tracking-wider mb-4">Datos de mi cuenta</p>
 
         <div *ngIf="usuario() as u">
@@ -64,7 +64,7 @@
       </div>
 
       <!-- ====== TAB: DATOS DE LA EMPRESA ====== -->
-      <div *ngIf="tabActiva() === 'empresa'" class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+      <div *ngIf="tabActiva() === 'empresa'" @tabContent class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
         <div class="flex items-center justify-between mb-4">
           <p class="text-xs font-bold text-red-600 uppercase tracking-wider">Datos de la empresa</p>
           <span *ngIf="guardadoExitoso()" class="text-[11px] font-semibold text-emerald-600">✓ Guardado</span>
@@ -145,7 +145,7 @@
       </div>
 
       <!-- ====== TAB: BANCOS (placeholder) ====== -->
-      <div *ngIf="tabActiva() === 'bancos'" class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+      <div *ngIf="tabActiva() === 'bancos'" @tabContent class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
         <p class="text-xs font-bold text-red-600 uppercase tracking-wider mb-4">Bancos / Billeteras para pagos QR</p>
         <div class="border border-dashed border-gray-200 rounded-xl p-8 text-center">
           <p class="text-xs text-gray-400">Próximamente: agrega, edita o desactiva los bancos disponibles para cobrar con QR.</p>
@@ -153,7 +153,7 @@
       </div>
 
      <!-- ====== TAB: BACKUP ====== -->
-<div *ngIf="tabActiva() === 'backup'" class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+<div *ngIf="tabActiva() === 'backup'" @tabContent class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
 <div class="flex items-center justify-between mb-4">
     <p class="text-xs font-bold text-red-600 uppercase tracking-wider">Respaldo de la base de datos</p>
     <div class="flex items-center gap-2">
@@ -282,7 +282,7 @@
 </div>
 
 @if (mostrarConfirmarRestaurarBackup()) {
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+  <div @modalAnimation class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
       <div class="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mx-auto mb-4">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

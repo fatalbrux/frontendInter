@@ -4,12 +4,13 @@ import { FormsModule } from '@angular/forms';
 import { PlanesService } from '../../core/services/planes';
 import { Plan } from '../../core/interfaces/plan';
 import { NotificacionesService } from '../../core/services/notificaciones';
-
+import { modalAnimation } from '../../core/animations';
 @Component({
   selector: 'app-planes',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './planes.html'
+  templateUrl: './planes.html',
+  animations: [modalAnimation],
 })
 export class Planes implements OnInit {
   private readonly planesService = inject(PlanesService);

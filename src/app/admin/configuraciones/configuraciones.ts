@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/services/auth';
 import { BackupService, BackupInfo, ConfiguracionBackup } from '../../core/services/backup';
 import { NotificacionesService } from '../../core/services/notificaciones';
-
+import { modalAnimation, tabContent } from '../../core/animations';
 interface UsuarioPerfil {
   id: number;
   email: string;
@@ -29,6 +29,8 @@ const EMPRESA_STORAGE_KEY = 'configuracionEmpresa';
   imports: [CommonModule, FormsModule],
   templateUrl: './configuraciones.html',
   styleUrl: './configuraciones.css',
+  animations: [modalAnimation, tabContent],
+
 })
 export class Configuraciones implements OnInit {
   usuario = signal<UsuarioPerfil | null>(null);

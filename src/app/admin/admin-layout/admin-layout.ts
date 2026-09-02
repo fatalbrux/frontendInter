@@ -8,7 +8,7 @@ import { filter, map } from 'rxjs/operators';
 import { OnInit } from '@angular/core';
 import { DashboardService } from '../../core/services/dashboard';
 import { AuthService } from '../../core/services/auth';
-import { toastSlide } from '../../core/animations';
+import { toastSlide, routeAnimations } from '../../core/animations';
 
 interface MenuItem {
   label: string;
@@ -41,7 +41,7 @@ const ICONS = {
   imports: [RouterOutlet, RouterLink, RouterLinkActive, CommonModule], // <-- agregué RouterLink y RouterLinkActive, se usan en el HTML
   templateUrl: './admin-layout.html',
   styleUrl: './admin-layout.css',
-  animations: [toastSlide],
+  animations: [toastSlide, routeAnimations],
 })
 export class AdminLayout implements OnInit{
   private readonly dashboardService = inject(DashboardService);
@@ -73,6 +73,7 @@ usuario = computed(() => {
 });
   notificationCount = 7;
   pageTitle = signal<string>('');
+  currentUrl = signal<string>('');
   //pageTitle = 'Clientes'; // TODO: setear desde route.data o un breadcrumb service
 
  private readonly baseMenuItems: Omit<MenuItem, 'badge'>[];
@@ -101,18 +102,16 @@ menuItems = computed<MenuItem[]>(() =>
 }
 
   ngOnInit(): void {
-  this.router.events.pipe(
-    filter((event) => event instanceof NavigationEnd),
-    map(() => {
-      let route = this.activatedRoute.firstChild;
-      while (route?.firstChild) {
-        route = route.firstChild;
-      }
-      return route?.snapshot.data['title'] ?? '';
-    })
-  ).subscribe((title: string) => {
-    this.pageTitle.set(title);
-  });
+this.router.events.pipe(
+  filter((event) => event instanceof NavigationEnd),
+).subscribe((event) => {
+  let route = this.activatedRoute.firstChild;
+  while (route?.firstChild) {
+    route = route.firstChild;
+  }
+  this.pageTitle.set(route?.snapshot.data['title'] ?? '');
+  this.currentUrl.set((event as NavigationEnd).urlAfterRedirects);
+});
 
   this.cargarMorososCount(); // nuevo
 }
@@ -129,6 +128,12 @@ menuItems = computed<MenuItem[]>(() =>
   toggleSidebar(): void {
     this.sidebarCollapsed = !this.sidebarCollapsed;
   }
+
+  getRouteAnimationData(outlet: RouterOutlet): string {
+  return outlet?.isActivated
+    ? outlet.activatedRoute.snapshot.routeConfig?.path ?? ''
+    : '';
+}
 
   private trust(html: string): SafeHtml {
     return this.sanitizer.bypassSecurityTrustHtml(html);

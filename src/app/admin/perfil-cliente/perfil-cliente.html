@@ -175,7 +175,7 @@
       <!-- TAB: Equipo Instalado -->
 <!-- TAB: Equipo Instalado -->
 @if (tabActiva() === 'equipo') {
-  <div class="p-6">
+  <div @tabContent class="p-6">
     @if (equipos().length === 0) {
       <p class="text-center text-gray-400 py-8">Este cliente no tiene equipos asignados.</p>
     } @else {
@@ -226,7 +226,7 @@
 
       <!-- TAB: Historial de Pagos -->
       @if (tabActiva() === 'pagos') {
-  <div class="p-6">
+  <div @tabContent class="p-6">
     @if (pagos().length === 0) {
       <p class="text-center text-gray-400 py-8">Este cliente aún no tiene pagos registrados.</p>
     } @else {
