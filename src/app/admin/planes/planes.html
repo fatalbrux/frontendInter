@@ -54,7 +54,7 @@
 </div>
 
 <!-- ====== MODAL PLAN ====== -->
-<div *ngIf="mostrarModal()" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+<div *ngIf="mostrarModal()" @modalAnimation class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
   <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
     <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
       <h3 class="text-base font-bold text-gray-800">{{ modoEdicion() ? 'Editar Plan' : 'Nuevo Plan' }}</h3>
@@ -99,7 +99,7 @@
 
 <!-- ====== CONFIRMAR ELIMINAR PLAN ====== -->
 @if (mostrarConfirmarEliminar()) {
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+  <div @modalAnimation class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
       <div class="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mx-auto mb-4">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

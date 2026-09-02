@@ -8,7 +8,7 @@ import { Cliente } from '../../core/interfaces/cliente';
 import { Equipo } from '../../core/interfaces/equipo';
 import { Pago } from '../../core/interfaces/pago';
 import { MapaUbicacion } from '../../admin/mapa-ubicacion/mapa-ubicacion';
-
+import { tabContent } from '../../core/animations';
 type Tab = 'general' | 'equipo' | 'pagos';
 
 @Component({
@@ -16,6 +16,7 @@ type Tab = 'general' | 'equipo' | 'pagos';
   standalone: true,
   imports: [CommonModule, MapaUbicacion],
   templateUrl: './perfil-cliente.html',
+  animations: [tabContent],
 })
 export class PerfilCliente implements OnInit {
   private readonly route = inject(ActivatedRoute);

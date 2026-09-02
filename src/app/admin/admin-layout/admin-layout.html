@@ -101,9 +101,9 @@
     </header>
 
     <!-- Área de contenido: aquí se renderiza cada pantalla (Clientes, Equipos, etc.) -->
-    <main class="flex-1 overflow-y-auto p-6">
-      <router-outlet></router-outlet>
-    </main>
+   <main class="flex-1 overflow-y-auto p-6" [@routeAnimations]="currentUrl()">
+  <router-outlet></router-outlet>
+</main>
   </div>
   <!-- ================= TOAST DE NOTIFICACIONES ================= -->
   @if (notificaciones.notificacion(); as toast) {
