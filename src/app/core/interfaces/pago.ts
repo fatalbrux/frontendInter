@@ -25,6 +25,7 @@ export interface Pago {
   banco?: BancoPago;
   vencimientoAnterior: Date | null;
   nuevoVencimiento: Date | null;
+  comprobanteUrl: string | null;
   notas: string;
   creadoEn: Date;
 }

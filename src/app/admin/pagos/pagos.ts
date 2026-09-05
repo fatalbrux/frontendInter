@@ -55,6 +55,7 @@ puedeRegistrarPago(cliente: Cliente | null): boolean {
   listaPlanes = signal<Plan[]>([]);
   bancosDisponibles: BancoPago[] = ['Banco Unión', 'Banco BNB', 'Banco Prodem', 'Tigo Money'];
   bancoSeleccionado = signal<BancoPago | null>(null);
+  comprobanteArchivo = signal<File | null>(null);
 
   // ================= FILTROS TABLA =================
   busquedaTabla = signal<string>('');
@@ -242,6 +243,17 @@ cobrosHoy(): number {
     this.busquedaCi.set('');
   }
 
+  onComprobanteSeleccionado(event: Event): void {
+  const input = event.target as HTMLInputElement;
+  this.comprobanteArchivo.set(input.files?.[0] ?? null);
+}
+quitarComprobante(event: Event, input: HTMLInputElement): void {
+  event.preventDefault();
+  event.stopPropagation();
+  this.comprobanteArchivo.set(null);
+  input.value = '';
+}
+
 confirmarPago(): void {
   const cliente = this.clienteSeleccionado();
   if (!cliente) return;
@@ -276,6 +288,12 @@ confirmarPago(): void {
     this.notificaciones.exito('Pago registrado exitosamente');
     this.listarClientes();
 
+    const archivo = this.comprobanteArchivo();
+if (archivo) {
+  this.pagosService.funSubirComprobante(pagoGuardado.id, archivo).subscribe({
+    error: (err) => console.error('No se pudo subir el comprobante', err),
+  });
+}
   this.reciboService.generarRecibo({
   nroRecibo: pagoGuardado.nroRecibo,
   fechaPago: pagoGuardado.fechaPago,
@@ -543,6 +561,22 @@ descargarRecibo(pago: Pago): void {
     usuarioCliente: pago.cliente?.usuario,
     telefonoCliente: pago.cliente?.telefono,
     proximoVencimiento: pago.nuevoVencimiento,
+  });
+}
+
+verComprobante(pago: Pago): void {
+  if (!pago.comprobanteUrl) return;
+
+  this.pagosService.funVerComprobante(pago.id).subscribe({
+    next: (blob) => {
+      const url = window.URL.createObjectURL(blob);
+      window.open(url, '_blank');
+      setTimeout(() => window.URL.revokeObjectURL(url), 60000);
+    },
+    error: (err) => {
+      console.error(err);
+      this.notificaciones.error('No se pudo cargar el comprobante');
+    },
   });
 }
 

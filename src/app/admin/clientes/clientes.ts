@@ -92,7 +92,8 @@ fechaVencimientoDisplay(cliente: Cliente): string {
   listaZonas = signal<Zona[]>([]);
   listaPlanes = signal<Plan[]>([]);
   bancosDisponibles: BancoPago[] = ['Banco Unión', 'Banco BNB', 'Banco Prodem', 'Tigo Money'];
-bancoSeleccionado = signal<BancoPago | null>(null);
+  bancoSeleccionado = signal<BancoPago | null>(null);
+  comprobanteArchivo = signal<File | null>(null);
 
   // ---------- estado de UI ----------
   cargando = signal<boolean>(false);
@@ -273,6 +274,7 @@ bancoSeleccionado = signal<BancoPago | null>(null);
 abrirModalPago(cli: Cliente): void {
   this.clienteParaPago.set(cli);
   this.bancoSeleccionado.set(null);
+  this.comprobanteArchivo.set(null); // 👈 nueva línea
   this.mesesAPagarCliente.set(0); // nuevo
   this.pagoAdelantadoCliente.set(false); // nuevo
   this.formularioPago = {
@@ -289,6 +291,17 @@ abrirModalPago(cli: Cliente): void {
     this.mostrarModalPago.set(false);
     this.clienteParaPago.set(null);
   }
+  onComprobanteSeleccionado(event: Event): void {
+  const input = event.target as HTMLInputElement;
+  this.comprobanteArchivo.set(input.files?.[0] ?? null);
+}
+
+quitarComprobante(event: Event, input: HTMLInputElement): void {
+  event.preventDefault();
+  event.stopPropagation();
+  this.comprobanteArchivo.set(null);
+  input.value = '';
+}
 
   // Recalcula el monto automáticamente según los meses seleccionados y el precio del plan
   actualizarMontoPorMeses(): void {
@@ -332,9 +345,17 @@ guardarPago(): void {
   next: (pagoGuardado) => {
     this.guardandoPago.set(false);
     this.notificaciones.exito('Pago registrado exitosamente');
+    
+     const archivo = this.comprobanteArchivo();
+  if (archivo) {
+    this.pagosService.funSubirComprobante(pagoGuardado.id, archivo).subscribe({
+      error: (err) => console.error('No se pudo subir el comprobante', err),
+    });
+  }
     this.cerrarModalPago();
     this.listar();
-
+    
+    
     this.reciboService.generarRecibo({
   nroRecibo: pagoGuardado.nroRecibo,
   fechaPago: pagoGuardado.fechaPago,

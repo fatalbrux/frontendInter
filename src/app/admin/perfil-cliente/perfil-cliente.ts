@@ -9,6 +9,9 @@ import { Equipo } from '../../core/interfaces/equipo';
 import { Pago } from '../../core/interfaces/pago';
 import { MapaUbicacion } from '../../admin/mapa-ubicacion/mapa-ubicacion';
 import { tabContent } from '../../core/animations';
+import { ReciboService } from '../../core/services/recibo';
+import { NotificacionesService } from '../../core/services/notificaciones';
+
 type Tab = 'general' | 'equipo' | 'pagos';
 
 @Component({
@@ -24,6 +27,8 @@ export class PerfilCliente implements OnInit {
   private readonly clientesService = inject(ClientesService);
   private readonly equiposService = inject(EquiposService);
   private readonly pagosService = inject(PagosService);
+  private readonly reciboService = inject(ReciboService);
+private readonly notificaciones = inject(NotificacionesService);
 
   cliente = signal<Cliente | null>(null);
 equipos = signal<Equipo[]>([]);
@@ -117,6 +122,37 @@ this.pagosService.funListar().subscribe({
   iniciales(cli: Cliente): string {
     return `${cli.nombres?.[0] ?? ''}${cli.apellidos?.[0] ?? ''}`.toUpperCase();
   }
+
+  // CODIGO PARA RECIBO Y VER COMPROBANTE
+  descargarRecibo(pago: Pago): void {
+  this.reciboService.generarRecibo({
+    nroRecibo: pago.nroRecibo,
+    fechaPago: pago.fechaPago,
+    monto: pago.monto,
+    mesesPagados: pago.mesesPagados,
+    metodoPago: pago.metodoPago,
+    nombreCliente: `${this.cliente()!.nombres} ${this.cliente()!.apellidos}`,
+    usuarioCliente: this.cliente()!.usuario,
+    telefonoCliente: this.cliente()!.telefono,
+    proximoVencimiento: pago.nuevoVencimiento,
+  });
+}
+
+verComprobante(pago: Pago): void {
+  if (!pago.comprobanteUrl) return;
+
+  this.pagosService.funVerComprobante(pago.id).subscribe({
+    next: (blob) => {
+      const url = window.URL.createObjectURL(blob);
+      window.open(url, '_blank');
+      setTimeout(() => window.URL.revokeObjectURL(url), 60000);
+    },
+    error: (err) => {
+      console.error(err);
+      this.notificaciones.error('No se pudo cargar el comprobante');
+    },
+  });
+}
 
   //CODIGO PARA TARJETA DE MESES PENDIENTES
 
