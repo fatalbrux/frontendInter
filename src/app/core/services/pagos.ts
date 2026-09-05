@@ -16,6 +16,16 @@ export class PagosService {
     return this.http.post<Pago>(this.urlBase, dato);
   }
 
+  funSubirComprobante(pagoId: number, archivo: File): Observable<{ mensaje: string; comprobanteUrl: string }> {
+  const formData = new FormData();
+  formData.append('archivo', archivo);
+    return this.http.post<{ mensaje: string; comprobanteUrl: string }>(`${this.urlBase}/${pagoId}/comprobante`, formData);
+  }
+
+  funVerComprobante(pagoId: number): Observable<Blob> {
+    return this.http.get(`${this.urlBase}/${pagoId}/comprobante`, { responseType: 'blob' });
+  }
+
   funEditar(dato: Partial<PagoPayload>, id: number): Observable<Pago> {
     return this.http.patch<Pago>(`${this.urlBase}/${id}`, dato);
   }
