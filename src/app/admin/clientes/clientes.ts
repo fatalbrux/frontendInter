@@ -24,7 +24,7 @@ const FORMULARIO_VACIO: ClientePayload = {
   nombres: '',
   apellidos: '',
   ci: '',
-  usuario: '',
+  usuario: 'user',
   telefono: '',
   email: '',
   direccion: '',
@@ -151,10 +151,7 @@ fechaVencimientoDisplay(cliente: Cliente): string {
     this.modoEdicion.set(false);
     this.idSeleccionado.set(null);
     this.errorMensaje.set(null);
-    this.formulario = {
-      ...FORMULARIO_VACIO,
-      codigo: `CLI-${Math.floor(100 + Math.random() * 900)}`, // sugerencia; el backend valida que sea único
-    };
+  this.formulario = { ...FORMULARIO_VACIO };
     this.mostrarModal.set(true);
   }
 
@@ -545,6 +542,24 @@ pagoAdelantadoCliente = signal<boolean>(false);
 private formatMesAnio(fecha: Date): string {
   const texto = fecha.toLocaleDateString('es-BO', { month: 'long', year: 'numeric' });
   return texto.charAt(0).toUpperCase() + texto.slice(1);
+}
+
+//Codigo para autocompletar mes de pago
+onFechaInstalacionChange(valor: string): void {
+  this.formulario.fechaInstalacion = valor;
+  if (valor) {
+    this.formulario.fechaPrimerPago = this.calcularPrimerPagoSugerido(valor);
+  }
+}
+
+private calcularPrimerPagoSugerido(fechaInstalacion: string): string {
+  const [anio, mes] = fechaInstalacion.split('-').map(Number);
+  // "mes" viene de 1 a 12 (marzo = 3). Al pasarlo tal cual a Date (que espera 0-11),
+  // el propio JS lo interpreta como el mes SIGUIENTE automáticamente.
+  const siguienteMes = new Date(anio, mes, 1);
+  const y = siguienteMes.getFullYear();
+  const m = String(siguienteMes.getMonth() + 1).padStart(2, '0');
+  return `${y}-${m}-01`;
 }
 
 anioGridCliente = signal<number>(new Date().getFullYear());

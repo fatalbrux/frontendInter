@@ -20,8 +20,8 @@ export interface Cliente {
   direccion: string;
   email: string;
   referencia: string;
-  fechaInstalacion: Date;
-  fechaPrimerPago: Date;
+  fechaInstalacion: string;
+  fechaPrimerPago: string;
   estado: string;
   proximoVencimiento: Date;
   observaciones: string;
@@ -44,8 +44,8 @@ export interface ClientePayload {
   email?: string;
   direccion?: string;
   referencia?: string;
-  fechaInstalacion?: Date;
-  fechaPrimerPago?: Date;
+  fechaInstalacion?: string;
+  fechaPrimerPago?: string;
   estado?: EstadoCliente;
   observaciones?: string;
   zonaId?: number;
